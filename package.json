@@ -1,0 +1,38 @@
+{
+  "name": "rolequill",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rolequill MVP",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "nextjs",
+    "rolequill",
+    "job-application",
+    "ai"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "groq-sdk": "^1.1.2",
+    "next": "^16.2.5",
+    "next-auth": "^4.24.14",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "unpdf": "^1.6.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.5",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
+  }
+}
