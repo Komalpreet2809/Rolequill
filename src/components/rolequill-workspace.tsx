@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -26,11 +26,6 @@ type ChatEntry = {
   mode?: AskMode | null;
 };
 
-const quickQuestions = [
-  "Why am I a strong fit for this role?",
-  "What project should I highlight for this job?",
-  "Write a concise answer for this application prompt.",
-];
 
 function statusLabel(mode: AskMode | null, model: string | null) {
   if (mode === "groq") return model ? `Groq live / ${model}` : "Groq live";
@@ -132,16 +127,11 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
   const [resumeFileDataUrl, setResumeFileDataUrl] = useState("");
   const [resumeMimeType, setResumeMimeType] = useState("");
   const [jobDescription, setJobDescription] = useState("");
-  const [question, setQuestion] = useState("Why am I a strong fit for this role?");
+  const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [chatEntries, setChatEntries] = useState<ChatEntry[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Ask your application question below and I will answer from your resume and the current job description.",
-      mode: null,
-    },
-  ]);
+
+  const [chatEntries, setChatEntries] = useState<ChatEntry[]>([]);
+
   const [mode, setMode] = useState<AskMode | null>(null);
   const [model, setModel] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -313,10 +303,15 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
   }
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-6 pb-20 pt-10 sm:px-10 lg:px-12">
-      <div className="grid items-start gap-8 lg:grid-cols-[0.84fr_1.16fr]">
-        <aside className="space-y-5 rounded-[2rem] border border-stone-300/70 bg-[#171412] p-6 text-stone-100 shadow-[0_24px_70px_rgba(28,25,23,0.16)]">
-          <div className="flex items-center gap-4 rounded-[1.5rem] border border-stone-800 bg-stone-950/40 p-4">
+    <>
+      <section id="context" className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-12">
+        <div className="grid w-full items-start gap-8 lg:grid-cols-[0.84fr_1.16fr]">
+        <aside className="space-y-8 rounded-[2rem] border border-stone-300/70 bg-[#171412] p-6 text-stone-100 shadow-[0_24px_70px_rgba(28,25,23,0.16)] sm:p-8">
+          <div className="flex items-center gap-3 px-2">
+            <img src="/logo.png" alt="Rolequill Logo" className="h-10 w-10 object-contain invert mix-blend-screen" />
+            <span className="text-sm font-bold uppercase tracking-[0.24em] text-stone-300">Rolequill</span>
+          </div>
+          <div className="flex items-center gap-4 rounded-[1.5rem] border border-stone-800 bg-stone-950/40 p-5 sm:p-6">
             {userImage ? (
               <Image
                 src={userImage}
@@ -338,29 +333,9 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
             </div>
           </div>
 
-          <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-stone-500">Rolequill</p>
-            <h2 className="mt-3 font-serif text-4xl leading-none text-stone-50">
-              Resume in. Job description in. Ask anything.
-            </h2>
-          </div>
 
-          <div className="rounded-[1.5rem] border border-stone-800 bg-stone-950/40 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">Status</p>
-                <p className="mt-2 text-lg font-semibold text-stone-50">{statusLabel(mode, model)}</p>
-              </div>
-              <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusStyle(mode)}`}>
-                {hasResume ? "Profile loaded" : "Waiting for resume"}
-              </span>
-            </div>
-            <p className="mt-3 text-sm leading-6 text-stone-300">
-              {message ?? "Upload the resume, paste the JD, and ask one focused application question."}
-            </p>
-          </div>
 
-          <div className="rounded-[1.5rem] border border-stone-800 bg-stone-950/40 p-4 space-y-3">
+          <div className="rounded-[1.5rem] border border-stone-800 bg-stone-950/40 p-5 space-y-4 sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">Profile links</p>
@@ -394,10 +369,7 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] border border-stone-800 p-4 text-sm leading-7 text-stone-300">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">Accepted formats</p>
-            <p className="mt-2">PDF, TXT, and other text-based files. Rolequill keeps the uploaded file and extracts text in the background for AI answers.</p>
-          </div>
+
         </aside>
 
         <div className="space-y-8">
@@ -409,10 +381,12 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
                   <h1 className="mt-4 font-serif text-4xl leading-none tracking-[-0.04em] text-stone-950">
                     {resumeFileName}
                   </h1>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-700">
-                    This file stays loaded until you replace it.
-                    {!canOpenResumeFile ? " Re-upload it once to enable preview in the dialog." : ""}
-                  </p>
+                  <p className="mt-3 text-sm text-stone-700">PDF, TXT, MD, RTF</p>
+                  {!canOpenResumeFile ? (
+                    <p className="mt-2 max-w-2xl text-sm leading-7 text-stone-700">
+                      Re-upload once to enable preview.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <button
@@ -445,14 +419,12 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
             </section>
           ) : (
             <section className="rounded-[2rem] border border-stone-300/70 bg-white/75 p-6 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-8">
-              <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <h1 className="font-serif text-5xl leading-none tracking-[-0.04em] text-stone-950">
                     Upload your resume
                   </h1>
-                  <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-600">
-                    Upload it once. Rolequill keeps the original file on this device and extracts text in the background for AI answers.
-                  </p>
+                  <p className="mt-3 text-sm text-stone-600">PDF, TXT, MD, RTF</p>
                 </div>
                 <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800">
                   {isUploading ? "Uploading..." : "Choose file"}
@@ -478,9 +450,7 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-3xl font-semibold text-stone-950">Paste the job description</h2>
-                <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-600">
-                  Add the target role description so the answer matches the company context, required skills, and writing style.
-                </p>
+
               </div>
             </div>
 
@@ -501,100 +471,108 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
       </div>
 
 
-      <section className="mt-8 rounded-[2rem] border border-stone-300/70 bg-white/80 p-6 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-8">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-3xl font-semibold text-stone-950">Ask AI your application question</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-600">
-              Use it like a focused chatbot. Keep the same resume and JD context, then ask follow-up questions freely.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {answer ? (
-              <button
-                type="button"
-                onClick={handleCopyAnswer}
-                className="rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-900 transition hover:border-stone-500"
-              >
-                {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy failed" : "Copy"}
-              </button>
-            ) : null}
-            <span className={`rounded-full border px-3 py-2 text-xs font-semibold ${statusStyle(mode)}`}>
-              {statusLabel(mode, model)}
-            </span>
-          </div>
-        </div>
+      </section>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {quickQuestions.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setQuestion(item)}
-              className="rounded-full border border-stone-300 bg-white px-3 py-2 text-sm text-stone-700 transition hover:border-stone-500"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6 rounded-[1.8rem] border border-stone-300/80 bg-[#fcfaf6]">
-          <div className="max-h-[24rem] min-h-[18rem] space-y-4 overflow-y-auto px-5 py-5">
-            {chatEntries.map((entry) => (
-              <div key={entry.id} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[88%] rounded-[1.5rem] px-4 py-3 text-sm leading-7 shadow-sm sm:max-w-[78%] ${
-                    entry.role === "user"
-                      ? "bg-stone-950 text-stone-50"
-                      : "border border-stone-200 bg-white text-stone-700"
-                  }`}
-                >
-                  <p className="whitespace-pre-wrap">{entry.content}</p>
-                  {entry.role === "assistant" && entry.mode ? (
-                    <span className={`mt-3 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusStyle(entry.mode)}`}>
-                      {entry.mode === "groq" ? "AI answer" : "Fallback"}
-                    </span>
-                  ) : null}
-                </div>
+      <section id="chat" className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-12">
+        <div className="w-full rounded-[2rem] border border-stone-300/70 bg-white/80 p-6 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-8">
+        <div className="overflow-hidden rounded-[2rem] border border-stone-200 bg-[linear-gradient(180deg,#ffffff_0%,#fbf8f2_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+          <div className="max-h-[30rem] min-h-[22rem] overflow-y-auto px-6 py-8">
+            {chatEntries.length ? (
+              <div className="space-y-6">
+                {chatEntries.map((entry) => (
+                  <div key={entry.id} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[86%] ${
+                        entry.role === "user"
+                          ? "rounded-[1.6rem] bg-stone-950 px-5 py-4 text-stone-50 shadow-[0_12px_30px_rgba(28,25,23,0.16)]"
+                          : "rounded-[1.6rem] border border-stone-200 bg-white px-5 py-4 text-stone-700 shadow-[0_10px_24px_rgba(120,53,15,0.06)]"
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap text-sm leading-7">{entry.content}</p>
+                      {entry.role === "assistant" && entry.mode ? (
+                        <span className={`mt-4 inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusStyle(entry.mode)}`}>
+                          {entry.mode === "groq" ? "AI answer" : "Fallback"}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="flex min-h-[20rem] flex-col items-center justify-center text-center">
+                <div className="inline-flex items-center gap-3 text-stone-900">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] bg-white p-3 shadow-[0_12px_30px_rgba(28,25,23,0.16)] border border-stone-200">
+                    <img src="/logo.png" alt="Rolequill Logo" className="h-full w-full object-contain mix-blend-multiply" />
+                  </div>
+                  <h2 className="font-serif text-5xl leading-none tracking-[-0.04em] text-stone-900">
+                    Rolequill chat
+                  </h2>
+                </div>
+
+              </div>
+            )}
 
             {isAsking ? (
-              <div className="flex justify-start">
-                <div className="max-w-[78%] rounded-[1.5rem] border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500 shadow-sm">
+              <div className="mt-6 flex justify-start">
+                <div className="max-w-[86%] rounded-[1.6rem] border border-stone-200 bg-white px-5 py-4 text-sm leading-7 text-stone-500 shadow-[0_10px_24px_rgba(120,53,15,0.06)]">
                   Rolequill is drafting your answer...
                 </div>
               </div>
             ) : null}
           </div>
 
-          <div className="border-t border-stone-200 px-5 py-4">
+          <div className="border-t border-stone-200 bg-[#f6f1e8] px-4 py-4 sm:px-5">
             {askError ? (
               <p className="mb-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {askError}
               </p>
             ) : null}
 
-            <div className="rounded-[1.6rem] border border-stone-300 bg-white p-3 shadow-sm">
-              <textarea
-                value={question}
-                onChange={(event) => setQuestion(event.target.value)}
-                rows={4}
-                placeholder="Ask Rolequill anything about this application."
-                className="w-full resize-none bg-transparent px-2 py-2 text-sm leading-7 text-stone-800 outline-none placeholder:text-stone-400"
-              />
-              <div className="mt-3 flex items-center justify-end gap-3 px-2 pb-1">
+            <div className="rounded-[2rem] border border-stone-300 bg-[#211e1a] p-3 shadow-[0_18px_38px_rgba(28,25,23,0.18)]">
+              <div className="flex items-end gap-3">
+                <label className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-stone-700 text-stone-300 transition hover:border-stone-500 hover:text-stone-50">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                  </svg>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt,.md,.rtf"
+                    onChange={handleResumeUpload}
+                    disabled={isUploading}
+                    className="hidden"
+                  />
+                </label>
+                <div className="flex-1">
+                  <div className="mb-2 flex items-center gap-2 px-1 text-xs uppercase tracking-[0.18em] text-stone-500">
+                    <span>Rolequill</span>
+                    <span className="text-stone-700">/</span>
+                    <span>Application assistant</span>
+                  </div>
+                  <textarea
+                    value={question}
+                    onChange={(event) => setQuestion(event.target.value)}
+                    rows={3}
+                    placeholder="How can Rolequill help with this application?"
+                    className="min-h-[4.5rem] w-full resize-none bg-transparent px-1 py-1 text-sm leading-7 text-stone-50 outline-none placeholder:text-stone-500"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={handleAsk}
                   disabled={isAsking || !resumeText.trim() || !jobDescription.trim() || !question.trim()}
-                  className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
+                  aria-label={isAsking ? "Sending" : "Send message"}
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-stone-50 text-stone-950 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-stone-500 disabled:text-stone-200"
                 >
-                  {isAsking ? "Sending..." : "Send"}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m7 17 9.5-9.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h9v9" />
+                  </svg>
                 </button>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </section>
       {isPreviewOpen && canOpenResumeFile ? (
@@ -649,7 +627,7 @@ export function RolequillWorkspace({ userName, userEmail, userImage }: Rolequill
           </div>
         </div>
       ) : null}
-    </section>
+    </>
   );
 }
 

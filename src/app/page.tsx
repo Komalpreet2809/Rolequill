@@ -10,28 +10,43 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#fff8ec_0%,_#f8f1e7_32%,_#eadfce_100%)] text-stone-950">
-      <section className="mx-auto w-full max-w-7xl px-6 pt-8 sm:px-10 lg:px-12">
-        <div className="flex justify-end pb-4">
-          {session ? <SignOutButton /> : null}
-          {!session && githubConfigured ? <GitHubSignInButton /> : null}
-          {!githubConfigured ? (
-            <div className="max-w-md rounded-[1.5rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-              Configure `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET` in `.env.local` to enable GitHub login. Rolequill is now GitHub-first.
+      <section className="pb-12">
+        <div className="mx-auto flex w-full flex-col px-4 pt-2 sm:px-6 lg:px-8">
+          <header className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-4">
+              <img src="/logo.png" alt="Rolequill Logo" className="h-16 w-16 object-contain mix-blend-multiply" />
+              <p className="text-lg font-bold uppercase tracking-[0.4em] text-stone-950">Rolequill</p>
             </div>
-          ) : null}
-        </div>
+            <div className="flex items-center gap-4">
+              {session ? <SignOutButton /> : null}
+              {!session && githubConfigured ? <GitHubSignInButton /> : null}
+              {!githubConfigured ? (
+                <div className="max-w-md rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs leading-5 text-amber-900">
+                  Configure GitHub login in `.env.local`.
+                </div>
+              ) : null}
+            </div>
+          </header>
 
-        <header className="border-b border-stone-300/70 pb-10">
-          <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-[0.35em] text-stone-500">Rolequill</p>
-            <h1 className="mt-6 font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950 sm:text-6xl lg:text-7xl">
-              Connect GitHub, upload your resume, paste the JD, ask the question.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-700 sm:text-xl">
-              GitHub login is required so Rolequill can be tied to your project identity before generating grounded application answers.
-            </p>
+          <div className="flex items-start pt-12 pb-20">
+            <div className="max-w-4xl">
+              <h1 className="font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950 sm:text-6xl lg:text-7xl">
+                Connect GitHub, load your context, then ask better application questions.
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-stone-700 sm:text-lg">
+                Resume, links, and the job description live in one place. The chat below answers from that context.
+              </p>
+              {session ? (
+                <a
+                  href="#context"
+                  className="mt-10 inline-flex items-center rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800"
+                >
+                  Scroll to context
+                </a>
+              ) : null}
+            </div>
           </div>
-        </header>
+        </div>
       </section>
 
       {session ? (
@@ -41,32 +56,15 @@ export default async function Home() {
           userImage={session.user?.image}
         />
       ) : (
-        <section className="mx-auto w-full max-w-7xl px-6 pb-20 pt-10 sm:px-10 lg:px-12">
-          <div className="rounded-[2rem] border border-stone-300/70 bg-white/80 p-8 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-10">
-            <p className="text-sm uppercase tracking-[0.28em] text-stone-500">Before you start</p>
-            <h2 className="mt-4 font-serif text-4xl leading-none tracking-[-0.04em] text-stone-950 sm:text-5xl">
-              GitHub is the required entry point.
+        <section id="context" className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-12">
+          <div className="w-full rounded-[2rem] border border-stone-300/70 bg-white/80 p-8 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-10">
+            <h2 className="font-serif text-4xl leading-none tracking-[-0.04em] text-stone-950 sm:text-5xl">
+              Connect GitHub to continue.
             </h2>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-stone-700 sm:text-lg">
-              Rolequill should answer from your resume plus your GitHub project context, so the app no longer runs in guest mode.
-            </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-stone-500">1. Sign in</p>
-                <p className="mt-3 text-sm leading-7 text-stone-700">Connect your GitHub account first.</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-stone-500">2. Add context</p>
-                <p className="mt-3 text-sm leading-7 text-stone-700">Upload the resume and paste the target job description.</p>
-              </div>
-              <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-stone-500">3. Generate answers</p>
-                <p className="mt-3 text-sm leading-7 text-stone-700">Ask one application question at a time and refine the result.</p>
-              </div>
-            </div>
           </div>
         </section>
       )}
     </main>
   );
 }
+
