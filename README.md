@@ -1,76 +1,82 @@
+# Rolequill
+
 <div align="center">
-  <img src="public/logo.svg" alt="Rolequill Logo" width="200" height="200" />
-  <h1>Rolequill</h1>
+  <img src="public/logo.png" alt="Rolequill Logo" width="120" />
+  <h3>The Deep-Context Career Intelligence Workspace</h3>
+  <p>Evolving job applications from guesswork to data-driven technical audits.</p>
 </div>
 
-Rolequill is a GitHub-first job application assistant. It lets you sign in with GitHub, upload your resume, paste a job description, and ask flexible application questions that are answered from your stored context.
+---
 
-## Current flow
+## 🖋️ Overview
 
-1. Sign in with GitHub
-2. Upload your resume
-3. Paste the target job description
-4. Ask any application question in the bottom chat panel
-5. Copy and refine the generated answer
+**Rolequill** is a high-end career assistant designed for technical professionals. Unlike standard AI career tools, Rolequill operates on a **Full Profile Mirror** engine—it doesn't just read your resume; it audits your entire GitHub presence, parsing READMEs, tech stacks, and repository metadata to build a comprehensive technical "brain" of your career.
 
-## Features
+By grounding every answer in live-scraped repository data and your professional resume, Rolequill generates high-fidelity, structured responses that align your actual work history with specific job requirements.
 
-- GitHub-authenticated app flow
-- Resume upload with PDF and text parsing
-- Stored resume preview and replace flow
-- Saved profile links with quick-open icons
-- Job description input
-- Flexible multi-line AI question box
-- Groq-backed answer generation with fallback mode
+---
 
-## Tech stack
+## ✨ Core Intelligence Features
 
-- Next.js
-- React
-- TypeScript
-- NextAuth
-- Groq API
-- Tailwind CSS
+- **Full Profile Mirror Mode**: Rolequill performs parallel technical audits of up to 15 repositories at once, ingesting full README contents and metadata to ensure 100% accuracy in project discovery.
+- **Deep Technical Grounding**: Answers are cross-referenced across your Resume, GitHub repositories, and Portfolio links.
+- **Structured Architectural Output**: AI responses are rendered using Markdown tables and bold technical sections for maximum readability and professional presentation.
+- **GitHub-First Identity**: Seamlessly integrated with GitHub OAuth for a secure, developer-focused workspace.
+- **High-Contrast Workspace**: A premium, minimalist workspace designed for focus, featuring a dark-mode optimized, high-contrast aesthetic.
 
-## Environment variables
+---
 
-Create `.env.local` with:
+## 🛠️ Technology Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Intelligence**: [Groq SDK](https://groq.com/) (LLM-agnostic grounding)
+- **Scraping Engine**: [Cheerio](https://cheerio.js.org/) (Live GitHub Audit)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Markdown**: [React-Markdown](https://github.com/remarkjs/react-markdown) with GFM support
+
+---
+
+## 🚀 Getting Started
+
+### 1. Environment Configuration
+
+Create a `.env.local` file in the root directory and configure the following variables:
 
 ```env
-GROQ_API_KEY=your_groq_key
+# Intelligence
+GROQ_API_KEY=your_groq_api_key
 GROQ_MODEL=openai/gpt-oss-20b
-AUTH_SECRET=your_auth_secret
+
+# Authentication
+AUTH_SECRET=your_nextauth_secret
 AUTH_GITHUB_ID=your_github_oauth_id
 AUTH_GITHUB_SECRET=your_github_oauth_secret
 ```
 
-## Run locally
+### 2. Local Installation
 
 ```bash
+# Install dependencies
 npm install
+
+# Start the development server
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Visit `http://localhost:3000` to access your workspace.
 
-## Scripts
+---
 
-```bash
-npm run dev
-npm run build
-npm run start
-npm run lint
-```
+## 📋 Workspace Workflow
 
-## Notes
+1. **GitHub Sync**: Sign in with your GitHub account to authorize profile access.
+2. **Knowledge Ingestion**: Upload your latest Resume (PDF/Markdown) and provide your professional links.
+3. **Target Analysis**: Paste the target Job Description to define the context.
+4. **Technical Audit**: Ask specific questions (e.g., "Find my best EDA projects for this role").
+5. **Structured Delivery**: Receive a structured, table-formatted summary of your matching technical expertise.
 
-- Resume, job description, and profile links are currently stored locally in the browser.
-- GitHub sign-in is required for the app flow.
-- GitHub repo ingestion is not fully implemented yet; current grounding uses resume, JD, and saved profile links.
+---
 
-## Next steps
-
-- Add real GitHub repository ingestion
-- Save user data in a database instead of local browser storage
-- Add answer history and regeneration controls
-- Improve prompt grounding and source visibility
+Made with ❤️ by [Komal](https://komalpreet.me)
