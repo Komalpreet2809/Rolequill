@@ -1,6 +1,48 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-float-delayed: float 8s ease-in-out 4s infinite;
+  --animate-fade-in-up: fade-in-up 1s ease-out forwards;
+  --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s infinite linear;
+  --animate-slide-in-bottom: slide-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-sweep: sweep 6s infinite ease-in-out;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes slide-in-bottom {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes sweep {
+    0% { transform: translateX(-100%) skewX(-45deg); }
+    20%, 100% { transform: translateX(200%) skewX(-45deg); }
+  }
+}
+
 :root {
   --background: #f3ebdf;
   --foreground: #1c1917;
@@ -16,9 +58,19 @@ html {
 
 body {
   margin: 0;
-  background: var(--background);
+  background: radial-gradient(circle at top, rgba(255, 247, 219, 0.95) 0%, rgba(243, 235, 223, 0.92) 42%, rgba(230, 220, 202, 0.98) 100%);
   color: var(--foreground);
   font-family: "Manrope", sans-serif;
+  transition: background 0.5s ease;
+}
+
+.dark body {
+  background: radial-gradient(circle at top, rgba(28, 25, 23, 0.98) 0%, rgba(12, 10, 9, 1) 100%);
+}
+
+::selection {
+  background: rgba(120, 53, 15, 0.18);
+  color: #1c1917;
 }
 
 h1,

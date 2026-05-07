@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/logo.png" alt="Rolequill Logo" width="200" height="200" />
+  <img src="public/logo.svg" alt="Rolequill Logo" width="200" height="200" />
   <h1>Rolequill</h1>
 </div>
 

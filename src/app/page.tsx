@@ -1,70 +1,117 @@
+import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { GitHubSignInButton, SignOutButton } from "@/components/auth-controls";
 import { RolequillWorkspace } from "@/components/rolequill-workspace";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const githubConfigured = Boolean(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET);
+
+function SparklesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+    </svg>
+  );
+}
+
+
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_#fff8ec_0%,_#f8f1e7_32%,_#eadfce_100%)] text-stone-950">
-      <section className="pb-12">
-        <div className="mx-auto flex w-full flex-col px-4 pt-2 sm:px-6 lg:px-8">
-          <header className="flex items-center justify-between py-4">
-            <div className="flex items-center gap-4">
-              <img src="/logo.png" alt="Rolequill Logo" className="h-16 w-16 object-contain mix-blend-multiply" />
-              <p className="text-lg font-bold uppercase tracking-[0.4em] text-stone-950">Rolequill</p>
-            </div>
-            <div className="flex items-center gap-4">
-              {session ? <SignOutButton /> : null}
-              {!session && githubConfigured ? <GitHubSignInButton /> : null}
-              {!githubConfigured ? (
-                <div className="max-w-md rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs leading-5 text-amber-900">
-                  Configure GitHub login in `.env.local`.
-                </div>
-              ) : null}
-            </div>
-          </header>
+    <main className="snap-y snap-proximity overflow-x-hidden bg-[radial-gradient(circle_at_top,_rgba(253,244,214,0.95)_0%,_rgba(245,234,216,0.92)_38%,_rgba(230,220,202,0.96)_100%)] text-stone-950 transition-colors duration-500 dark:bg-[radial-gradient(circle_at_top,_rgba(28,25,23,0.98)_0%,_rgba(12,10,9,1)_100%)] dark:text-stone-50">
+      <header className="absolute top-0 left-0 z-50 w-full px-4 py-6 sm:px-8 lg:px-10">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-stone-950 dark:text-stone-50">
+            <img src="/logo.png" alt="Rolequill Logo" className="h-10 w-10 dark:invert" />
+            <p className="font-mono text-2xl font-bold tracking-tight uppercase text-stone-900 dark:text-stone-50">
+              Role<span className="text-stone-500 dark:text-stone-400">quill</span>
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <ThemeToggle />
+            {session ? <SignOutButton /> : null}
+            {!session && githubConfigured ? <GitHubSignInButton /> : null}
+          </div>
+        </div>
+      </header>
 
-          <div className="flex items-start pt-12 pb-20">
-            <div className="max-w-4xl">
-              <h1 className="font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950 sm:text-6xl lg:text-7xl">
-                Connect GitHub, load your context, then ask better application questions.
+      <section className="relative flex min-h-screen snap-start flex-col overflow-hidden pt-12 pb-12">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:invert" />
+          <div className="absolute left-[-10%] top-[-12rem] h-[28rem] w-[28rem] animate-float rounded-full bg-amber-300/20 blur-3xl dark:bg-amber-900/10" />
+          <div className="absolute right-[-8%] top-[18%] h-[24rem] w-[24rem] animate-float-delayed rounded-full bg-orange-200/25 blur-3xl dark:bg-orange-950/10" />
+          <div className="absolute bottom-[-8rem] left-[18%] h-[22rem] w-[22rem] animate-float rounded-full bg-white/40 blur-3xl dark:bg-stone-800/20" />
+          
+          <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center select-none opacity-[0.03] dark:opacity-[0.02]">
+            <img src="/logo.png" alt="Rolequill Logo Watermark" className="h-[20rem] w-[20rem] object-contain grayscale -mb-24 dark:invert animate-breathe" />
+            <h2 className="font-serif text-[24rem] font-bold tracking-tighter text-stone-950 dark:text-stone-50">Rolequill</h2>
+          </div>
+        </div>
+ 
+        <div className="relative flex w-full flex-1 flex-col px-4 sm:px-8 lg:px-10">
+          <div className="flex flex-1 flex-col items-center justify-center py-12 text-center lg:py-24">
+            <div className="max-w-5xl animate-fade-in-up">
+              <h1 className="font-serif text-6xl font-black leading-[1.1] tracking-[-0.06em] text-stone-950 sm:text-7xl lg:text-[7.5rem] dark:text-stone-50">
+                Master Every Role <br /> with <span className="text-stone-500 dark:text-stone-400">Total Context.</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-stone-700 sm:text-lg">
-                Resume, links, and the job description live in one place. The chat below answers from that context.
+              <p className="mt-10 mx-auto max-w-3xl text-base leading-9 text-stone-700 sm:text-lg dark:text-stone-400 opacity-0 [animation-delay:400ms] animate-fade-in-up">
+                Rolequill crafts personalized job application drafts grounded in your career history. Connect your resume, links, and job brief to generate context-aware answers for every role.
               </p>
-              {session ? (
+
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-5 opacity-0 [animation-delay:800ms] animate-fade-in-up">
                 <a
-                  href="#context"
-                  className="mt-10 inline-flex items-center rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800"
+                  href={session ? "#workspace" : "#access"}
+                  className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-stone-950 px-10 py-5 text-sm font-bold text-white shadow-xl transition-all hover:bg-stone-800 dark:bg-white dark:text-black dark:hover:bg-stone-100"
                 >
-                  Scroll to context
+                  <div className="absolute inset-0 z-0 h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-sweep" />
+                  <span className="relative z-10" style={{ color: 'white' }} className="dark:!text-black">Start a new session</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" className="relative z-10 h-4 w-4 dark:!stroke-black" aria-hidden="true" style={{ color: 'white' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
                 </a>
-              ) : null}
+                <a
+                  href={session ? "#chat" : "#access"}
+                  className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full border border-stone-300/80 bg-white/60 px-10 py-5 text-sm font-semibold backdrop-blur transition-all hover:border-stone-500 hover:bg-white dark:bg-stone-950"
+                >
+                  <div className="absolute inset-0 z-0 h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-sweep [animation-delay:3s]" />
+                  <svg viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" className="relative z-10 h-5 w-5 dark:!stroke-white" aria-hidden="true" style={{ color: 'black' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746-3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746-3.746 0 0 1 3.296-1.043A3.746-3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746-3.746 0 0 1 3.296 1.043 3.746-3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                  </svg>
+                  <span className="relative z-10" style={{ color: 'black' }} className="dark:!text-white">Go to chat</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {session ? (
-        <RolequillWorkspace
-          userName={session.user?.name || "GitHub User"}
-          userEmail={session.user?.email || "GitHub account"}
-          userImage={session.user?.image}
-        />
+        <div id="workspace">
+          <RolequillWorkspace
+            userName={session.user?.name || "GitHub User"}
+            userEmail={session.user?.email || "GitHub account"}
+            userImage={session.user?.image}
+          />
+        </div>
       ) : (
-        <section id="context" className="mx-auto flex min-h-screen w-full max-w-7xl items-center px-6 py-16 sm:px-10 lg:px-12">
-          <div className="w-full rounded-[2rem] border border-stone-300/70 bg-white/80 p-8 shadow-[0_18px_50px_rgba(120,53,15,0.08)] backdrop-blur sm:p-10">
-            <h2 className="font-serif text-4xl leading-none tracking-[-0.04em] text-stone-950 sm:text-5xl">
-              Connect GitHub to continue.
-            </h2>
+        <section id="access" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-center px-6 py-16 sm:px-10 lg:px-12">
+          <div className="w-full overflow-hidden rounded-[2.4rem] border border-white/70 bg-white/72 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur dark:border-stone-800 dark:bg-stone-900/40">
+            <div className="flex flex-col items-center justify-center p-12 text-center sm:p-20">
+                <p className="text-sm font-semibold uppercase tracking-[0.05em] text-stone-500 dark:text-stone-400">Access</p>
+                <h2 className="mt-8 font-serif text-5xl leading-[1.1] tracking-[-0.05em] text-stone-950 max-w-2xl dark:text-stone-50">
+                  Connect GitHub to open the working sections.
+                </h2>
+                <p className="mt-8 max-w-xl text-base leading-9 text-stone-700 dark:text-stone-300">
+                  Your context and chat are private to your session. Connect your account to start grounding AI in your career history.
+                </p>
+                {githubConfigured ? <div className="mt-12"><GitHubSignInButton /></div> : null}
+            </div>
           </div>
         </section>
       )}
     </main>
   );
 }
-

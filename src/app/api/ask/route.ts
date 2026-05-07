@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { AskResponse, ProfileData } from "@/lib/rolequill-assistant";
+import * as cheerio from "cheerio";
 
 export const runtime = "nodejs";
 
@@ -20,7 +21,96 @@ type NormalizedAskPayload = {
   jobDescription: string;
   question: string;
   profile: ProfileData;
+  scrapedContext?: string;
 };
+
+async function scrapeLink(url: string, query: string = ""): Promise<string> {
+  if (!url || !url.startsWith("http")) return "";
+  try {
+    const urlsToFetch = [url];
+    if (url.includes("github.com") && !url.includes("?tab=")) {
+      const baseUrl = url.split("?")[0].replace(/\/$/, "");
+      urlsToFetch.push(`${baseUrl}?tab=repositories&sort=stargazers`);
+      urlsToFetch.push(`${baseUrl}?tab=repositories&sort=updated`);
+    }
+
+    const firstPassResults = await Promise.all(urlsToFetch.map(async (u) => {
+      try {
+        const res = await fetch(u, { headers: { "User-Agent": "Rolequill-Assistant/1.0" }, cache: "no-store" });
+        if (!res.ok) return { html: "", url: u };
+        return { html: await res.text(), url: u };
+      } catch { return { html: "", url: u }; }
+    }));
+
+    let combinedText = "";
+    const repoLinks: { url: string; name: string; description: string; tags: string }[] = [];
+
+    firstPassResults.forEach(res => {
+      if (!res.html) return;
+      const $ = cheerio.load(res.html);
+      $("script, style, nav, footer, iframe").remove();
+      
+      if (res.url.includes("github.com")) {
+        $(".pinned-item-list-item, .repo-list-item, [itemprop='owns'], .wb-break-all").each((_, el) => {
+          const $el = $(el);
+          const link = $el.find("a[link-data-prefetch], a.Link--primary, a[itemprop='name codeRepository'], [itemprop='name'] a").first();
+          const href = link.attr("href");
+          const name = link.text().trim();
+          const desc = $el.find("[itemprop='description'], .f4.text-normal, .wb-break-all").text().trim();
+          const tags = $el.find(".topic-tag, [data-ga-click*='topic']").text().trim();
+          
+          if (href && !href.startsWith("http") && name) {
+            repoLinks.push({ url: `https://github.com${href}`, name, description: desc, tags });
+          }
+        });
+      } else {
+        combinedText += $("main, article, body").text() + " ";
+      }
+    });
+
+    const uniqueRepos = [...new Map(repoLinks.map(r => [r.url, r])).values()];
+    
+    // Sort logic to prioritize projects based on query OR default to best projects
+    let reposToDeepScan = uniqueRepos;
+    if (query) {
+      const q = query.toLowerCase();
+      reposToDeepScan = uniqueRepos.sort((a, b) => {
+        const score = (item: typeof a) => {
+          let s = 0;
+          const text = (item.name + " " + item.description + " " + item.tags).toLowerCase();
+          if (text.includes(q)) s += 15;
+          if (q.includes("eda") && (text.includes("data") || text.includes("analysis") || text.includes("notebook") || text.includes("socioeconomic"))) s += 10;
+          return s;
+        };
+        return score(b) - score(a);
+      });
+    }
+    
+    const limitedScan = reposToDeepScan.slice(0, 15);
+    if (limitedScan.length > 0) {
+      const readmeResults = await Promise.all(limitedScan.map(async (repo) => {
+        try {
+          const res = await fetch(repo.url, { headers: { "User-Agent": "Rolequill-Assistant/1.0" } });
+          if (!res.ok) return "";
+          const $ = cheerio.load(await res.text());
+          const readme = $("#readme").text();
+          return `\nTECHNICAL AUDIT: ${repo.url}\nName: ${repo.name}\nDescription: ${repo.description}\nTags: ${repo.tags}\nREADME:\n${readme}\n---`;
+        } catch { return ""; }
+      }));
+      combinedText += readmeResults.join("\n");
+    }
+
+    if (uniqueRepos.length > 15) {
+      combinedText += "\nSUMMARY OF OTHER REPOS:\n" + uniqueRepos.slice(15).map(r => `- ${r.name}: ${r.description} (Tags: ${r.tags})`).join("\n");
+    }
+
+    const finalContent = combinedText.replace(/\s+/g, " ").trim().slice(0, 16000);
+    return `Live Data from ${url}:\n${finalContent}\n---`;
+  } catch (e) {
+    console.error(`Scraping failed for ${url}`, e);
+    return "";
+  }
+}
 
 function buildFallbackAnswer(payload: NormalizedAskPayload) {
   return [
@@ -29,6 +119,7 @@ function buildFallbackAnswer(payload: NormalizedAskPayload) {
     "Based on the resume context and the job description, I would answer by focusing on the most relevant experience, the strongest matching project, and the skills that directly support the role requirements.",
     "",
     "To make this stronger, keep the answer tied to specific achievements from your resume and relate them directly to the role's expectations.",
+    ...(payload.scrapedContext ? ["", "P.S. I also analyzed your GitHub/Portfolio and found several projects that could strengthen this answer further."] : []),
   ].join("\n");
 }
 
@@ -46,28 +137,31 @@ function buildProfileSection(profile: ProfileData | undefined): string {
 function buildMessages(payload: NormalizedAskPayload) {
   const profileSection = buildProfileSection(payload.profile);
   const userParts = [
-    `Resume:\n${payload.resumeText}`,
-    `Job description:\n${payload.jobDescription}`,
+    `Resume Content (Highlights Only):\n${payload.resumeText || "None provided"}`,
+    `Job Description (Target Role):\n${payload.jobDescription || "None provided"}`,
+    ...(payload.scrapedContext ? [`Live Scraped Context (GitHub/Portfolio - FULL REPO LIST):\n${payload.scrapedContext}`] : []),
     ...(profileSection ? [profileSection] : []),
-    `Question:\n${payload.question}`,
+    `User Question:\n${payload.question}`,
   ];
 
   return [
     {
       role: "system" as const,
       content: [
-        "You are Rolequill, a grounded job application assistant.",
-        "Answer in first person as the candidate.",
-        "Use only the resume, job description, and profile links provided.",
-        "When relevant, reference the candidate's portfolio or social links naturally.",
-        "Do not invent facts, projects, metrics, companies, or experience.",
-        "If key information is missing, stay cautious and truthful.",
-        "Write a polished application-style answer, not bullet points.",
+        "You are Rolequill, a helpful AI career assistant. You talk naturally and intelligently, exactly like ChatGPT.",
+        "Your role is to assist the user by utilizing the career data you have access to (Resume, GitHub, Portfolio).",
+        "CRITICAL RULES:",
+        "1. STRUCTURED FORMATTING: Always provide answers in a highly structured, premium manner. Use Markdown tables for project comparisons, bold headings for sections, and bullet points for technical highlights.",
+        "2. ARCHITECTURAL LAYOUT: Avoid long walls of text. Use a clean, 'at-a-glance' format. If listing projects, use a table showing [Project Name | Tech Stack | Core Impact].",
+        "3. ACCURACY FIRST: When the user asks about a specific type of project (e.g., 'EDA'), only mention projects that are explicitly identified as such in their README or description. DO NOT guess.",
+        "4. NEVER impersonate the user. Always refer to the user in the second person (e.g., 'Your resume shows...', 'You have built...').",
+        "5. If you cannot find a project matching their criteria, be honest. Tell them you've scanned their GitHub but don't see a clear match.",
+        "6. Keep the tone professional, supportive, and conversational.",
       ].join("\n"),
     },
     {
       role: "user" as const,
-      content: userParts.join("\n\n"),
+      content: userParts.filter(p => p.trim().length > 5).join("\n\n"),
     },
   ];
 }
@@ -84,11 +178,25 @@ export async function POST(request: Request) {
   const jobDescription = payload.jobDescription?.trim() ?? "";
   const question = payload.question?.trim() ?? "";
 
-  if (!resumeText || !jobDescription || !question) {
+  if (!question) {
     return NextResponse.json(
-      { error: "Resume text, job description, and question are required." },
+      { error: "A question is required." },
       { status: 400 }
     );
+  }
+
+  // Scrape links if present to provide "live" context
+  let scrapedContext = "";
+  if (payload.profile) {
+    const linksToScrape = [
+      payload.profile.portfolioUrl,
+      payload.profile.githubUrl
+    ].filter(Boolean) as string[];
+    
+    if (linksToScrape.length > 0) {
+      const results = await Promise.all(linksToScrape.map(l => scrapeLink(l, question)));
+      scrapedContext = results.filter(Boolean).join("\n\n");
+    }
   }
 
   const normalizedPayload: NormalizedAskPayload = {
@@ -96,6 +204,7 @@ export async function POST(request: Request) {
     jobDescription,
     question,
     profile: payload.profile ?? {},
+    scrapedContext
   };
 
   if (!process.env.GROQ_API_KEY) {
@@ -137,6 +246,3 @@ export async function POST(request: Request) {
     } satisfies AskResponse);
   }
 }
-
-
-

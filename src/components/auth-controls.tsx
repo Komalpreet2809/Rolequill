@@ -30,10 +30,10 @@ export function GitHubSignInButton({ disabled = false }: GitHubSignInButtonProps
       type="button"
       onClick={() => signIn("github")}
       disabled={disabled}
-      className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 shadow-[0_12px_30px_rgba(28,25,23,0.12)] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
+      className="inline-flex h-[38px] w-[120px] items-center justify-center gap-2 rounded-full bg-stone-950 px-3 text-[10px] font-bold text-stone-50 shadow-[0_12px_30px_rgba(28,25,23,0.12)] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
     >
       <GitHubIcon />
-      Continue with GitHub
+      <span className="whitespace-nowrap">GitHub</span>
     </button>
   );
 }
@@ -43,10 +43,10 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={() => signOut()}
-      className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white/70 px-5 py-3 text-sm font-semibold text-stone-700 shadow-[0_12px_30px_rgba(28,25,23,0.05)] backdrop-blur transition hover:bg-white"
+      className="inline-flex h-[38px] w-[120px] items-center justify-center gap-2 rounded-full bg-stone-950 px-3 text-[10px] font-bold text-stone-50 shadow-[0_14px_32px_rgba(28,25,23,0.16)] transition hover:bg-stone-800"
     >
       <SignOutIcon />
-      Sign out
+      <span className="whitespace-nowrap">Sign out</span>
     </button>
   );
 }
