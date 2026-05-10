@@ -2,20 +2,10 @@ import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { GitHubSignInButton, SignOutButton } from "@/components/auth-controls";
-import { RolequillWorkspace } from "@/components/rolequill-workspace";
+import { RolequillDashboard } from "@/components/rolequill-dashboard";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const githubConfigured = Boolean(process.env.AUTH_GITHUB_ID && process.env.AUTH_GITHUB_SECRET);
-
-function SparklesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-    </svg>
-  );
-}
-
-
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -25,7 +15,7 @@ export default async function Home() {
       <header className="absolute top-0 left-0 z-50 w-full px-4 py-6 sm:px-8 lg:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-stone-950 dark:text-stone-50">
-            <img src="/logo.png" alt="Rolequill Logo" className="h-10 w-10 dark:invert" />
+            <Image src="/logo.png" alt="Rolequill Logo" width={40} height={40} className="h-10 w-10 dark:invert" />
             <p className="font-mono text-2xl font-bold tracking-tight uppercase text-stone-900 dark:text-stone-50">
               Role<span className="text-stone-500 dark:text-stone-400">quill</span>
             </p>
@@ -46,7 +36,7 @@ export default async function Home() {
           <div className="absolute bottom-[-8rem] left-[18%] h-[22rem] w-[22rem] animate-float rounded-full bg-white/40 blur-3xl dark:bg-stone-800/20" />
           
           <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center select-none opacity-[0.03] dark:opacity-[0.02]">
-            <img src="/logo.png" alt="Rolequill Logo Watermark" className="h-[20rem] w-[20rem] object-contain grayscale -mb-24 dark:invert animate-breathe" />
+            <Image src="/logo.png" alt="Rolequill Logo Watermark" width={320} height={320} className="h-[20rem] w-[20rem] object-contain grayscale -mb-24 dark:invert animate-breathe" />
             <h2 className="font-serif text-[24rem] font-bold tracking-tighter text-stone-950 dark:text-stone-50">Rolequill</h2>
           </div>
         </div>
@@ -55,7 +45,7 @@ export default async function Home() {
           <div className="flex flex-1 flex-col items-center justify-center py-12 text-center lg:py-24">
             <div className="max-w-5xl animate-fade-in-up">
               <h1 className="font-serif text-6xl font-black leading-[1.1] tracking-[-0.06em] text-stone-950 sm:text-7xl lg:text-[7.5rem] dark:text-stone-50">
-                Master Every Role <br /> with <span className="text-stone-500 dark:text-stone-400">Total Context.</span>
+                Master Every Role <br /> with <span className="bg-gradient-to-r from-amber-600 to-stone-600 bg-clip-text text-transparent dark:from-amber-200 dark:to-stone-400">Total Context.</span>
               </h1>
               <p className="mt-10 mx-auto max-w-3xl text-base leading-9 text-stone-700 sm:text-lg dark:text-stone-400 opacity-0 [animation-delay:400ms] animate-fade-in-up">
                 Rolequill crafts personalized job application drafts grounded in your career history. Connect your resume, links, and job brief to generate context-aware answers for every role.
@@ -67,7 +57,7 @@ export default async function Home() {
                   className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-stone-950 px-10 py-5 text-sm font-bold text-white shadow-xl transition-all hover:bg-stone-800 dark:bg-white dark:text-black dark:hover:bg-stone-100"
                 >
                   <div className="absolute inset-0 z-0 h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent animate-sweep" />
-                  <span className="relative z-10" style={{ color: 'white' }} className="dark:!text-black">Start a new session</span>
+                  <span className="relative z-10 text-white dark:!text-black">Start a new session</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" className="relative z-10 h-4 w-4 dark:!stroke-black" aria-hidden="true" style={{ color: 'white' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                   </svg>
@@ -80,7 +70,7 @@ export default async function Home() {
                   <svg viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" className="relative z-10 h-5 w-5 dark:!stroke-white" aria-hidden="true" style={{ color: 'black' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746-3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746-3.746 0 0 1 3.296-1.043A3.746-3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746-3.746 0 0 1 3.296 1.043 3.746-3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                   </svg>
-                  <span className="relative z-10" style={{ color: 'black' }} className="dark:!text-white">Go to chat</span>
+                  <span className="relative z-10 text-black dark:!text-white">Go to chat</span>
                 </a>
               </div>
             </div>
@@ -90,7 +80,7 @@ export default async function Home() {
 
       {session ? (
         <div id="workspace">
-          <RolequillWorkspace
+          <RolequillDashboard
             userName={session.user?.name || "GitHub User"}
             userEmail={session.user?.email || "GitHub account"}
             userImage={session.user?.image}

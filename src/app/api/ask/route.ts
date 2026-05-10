@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/auth";
 import { AskResponse, ProfileData } from "@/lib/rolequill-assistant";
-import * as cheerio from "cheerio";
 
 export const runtime = "nodejs";
 
@@ -14,6 +13,8 @@ type AskPayload = {
   jobDescription?: string;
   question?: string;
   profile?: ProfileData;
+  githubContext?: string;
+  chatHistory?: { role: "user" | "assistant"; content: string }[];
 };
 
 type NormalizedAskPayload = {
@@ -21,105 +22,84 @@ type NormalizedAskPayload = {
   jobDescription: string;
   question: string;
   profile: ProfileData;
-  scrapedContext?: string;
+  githubContext?: string;
+  chatHistory: { role: "user" | "assistant"; content: string }[];
 };
 
-async function scrapeLink(url: string, query: string = ""): Promise<string> {
-  if (!url || !url.startsWith("http")) return "";
-  try {
-    const urlsToFetch = [url];
-    if (url.includes("github.com") && !url.includes("?tab=")) {
-      const baseUrl = url.split("?")[0].replace(/\/$/, "");
-      urlsToFetch.push(`${baseUrl}?tab=repositories&sort=stargazers`);
-      urlsToFetch.push(`${baseUrl}?tab=repositories&sort=updated`);
-    }
+function isCasualPrompt(question: string) {
+  const normalized = question.trim().toLowerCase();
+  return /^(hi|hey|hello|yo|sup|thanks|thank you|cool|okay|ok)$/.test(normalized);
+}
 
-    const firstPassResults = await Promise.all(urlsToFetch.map(async (u) => {
-      try {
-        const res = await fetch(u, { headers: { "User-Agent": "Rolequill-Assistant/1.0" }, cache: "no-store" });
-        if (!res.ok) return { html: "", url: u };
-        return { html: await res.text(), url: u };
-      } catch { return { html: "", url: u }; }
-    }));
+function shouldUseRepoContext(question: string) {
+  const normalized = question.toLowerCase();
+  return /(project|projects|repo|repos|repository|repositories|github|portfolio|architecture|tech stack|codebase|talking point|talking points)/.test(
+    normalized
+  );
+}
 
-    let combinedText = "";
-    const repoLinks: { url: string; name: string; description: string; tags: string }[] = [];
+function shouldUseJobContext(question: string) {
+  const normalized = question.toLowerCase();
+  return /(job description|job profile|role profile|\bjd\b|consider the job|consider job|consider the role|consider role|take .*job profile.*consideration|take .*job description.*consideration|take .*jd.*consideration|for this role|for the role|for this job|fit for the role|fit for this role|fit for the job|job fit|role fit|match this role|match this job|aligned with the role|according to the jd)/.test(
+    normalized
+  );
+}
 
-    firstPassResults.forEach(res => {
-      if (!res.html) return;
-      const $ = cheerio.load(res.html);
-      $("script, style, nav, footer, iframe").remove();
-      
-      if (res.url.includes("github.com")) {
-        $(".pinned-item-list-item, .repo-list-item, [itemprop='owns'], .wb-break-all").each((_, el) => {
-          const $el = $(el);
-          const link = $el.find("a[link-data-prefetch], a.Link--primary, a[itemprop='name codeRepository'], [itemprop='name'] a").first();
-          const href = link.attr("href");
-          const name = link.text().trim();
-          const desc = $el.find("[itemprop='description'], .f4.text-normal, .wb-break-all").text().trim();
-          const tags = $el.find(".topic-tag, [data-ga-click*='topic']").text().trim();
-          
-          if (href && !href.startsWith("http") && name) {
-            repoLinks.push({ url: `https://github.com${href}`, name, description: desc, tags });
-          }
-        });
-      } else {
-        combinedText += $("main, article, body").text() + " ";
-      }
-    });
+function shouldUseResumeContext(question: string) {
+  const normalized = question.toLowerCase();
+  return /(resume|cv|experience|skills|background|education|strength|strengths|weakness|weaknesses|introduce me|tell me about myself|based on my profile)/.test(
+    normalized
+  );
+}
 
-    const uniqueRepos = [...new Map(repoLinks.map(r => [r.url, r])).values()];
-    
-    // Sort logic to prioritize projects based on query OR default to best projects
-    let reposToDeepScan = uniqueRepos;
-    if (query) {
-      const q = query.toLowerCase();
-      reposToDeepScan = uniqueRepos.sort((a, b) => {
-        const score = (item: typeof a) => {
-          let s = 0;
-          const text = (item.name + " " + item.description + " " + item.tags).toLowerCase();
-          if (text.includes(q)) s += 15;
-          if (q.includes("eda") && (text.includes("data") || text.includes("analysis") || text.includes("notebook") || text.includes("socioeconomic"))) s += 10;
-          return s;
-        };
-        return score(b) - score(a);
-      });
-    }
-    
-    const limitedScan = reposToDeepScan.slice(0, 15);
-    if (limitedScan.length > 0) {
-      const readmeResults = await Promise.all(limitedScan.map(async (repo) => {
-        try {
-          const res = await fetch(repo.url, { headers: { "User-Agent": "Rolequill-Assistant/1.0" } });
-          if (!res.ok) return "";
-          const $ = cheerio.load(await res.text());
-          const readme = $("#readme").text();
-          return `\nTECHNICAL AUDIT: ${repo.url}\nName: ${repo.name}\nDescription: ${repo.description}\nTags: ${repo.tags}\nREADME:\n${readme}\n---`;
-        } catch { return ""; }
-      }));
-      combinedText += readmeResults.join("\n");
-    }
+function shouldContinueJobContextFromHistory(history: { role: "user" | "assistant"; content: string }[]) {
+  const combined = history
+    .slice(-6)
+    .map((entry) => entry.content.toLowerCase())
+    .join("\n");
 
-    if (uniqueRepos.length > 15) {
-      combinedText += "\nSUMMARY OF OTHER REPOS:\n" + uniqueRepos.slice(15).map(r => `- ${r.name}: ${r.description} (Tags: ${r.tags})`).join("\n");
-    }
+  return /(job description|job profile|role profile|\bjd\b|for this role|for the role|for this job|fit for the role|fit for the job|consider the job|consider the role|according to the jd)/.test(
+    combined
+  );
+}
 
-    const finalContent = combinedText.replace(/\s+/g, " ").trim().slice(0, 16000);
-    return `Live Data from ${url}:\n${finalContent}\n---`;
-  } catch (e) {
-    console.error(`Scraping failed for ${url}`, e);
-    return "";
-  }
+function shouldContinueRepoContextFromHistory(history: { role: "user" | "assistant"; content: string }[]) {
+  const combined = history
+    .slice(-6)
+    .map((entry) => entry.content.toLowerCase())
+    .join("\n");
+
+  return /(project|projects|repo|repos|repository|repositories|github|architecture|tech stack|codebase|portfolio)/.test(
+    combined
+  );
 }
 
 function buildFallbackAnswer(payload: NormalizedAskPayload) {
+  if (isCasualPrompt(payload.question)) {
+    return "Hey. What do you want to work on?";
+  }
+
+  const useRepoContext = shouldUseRepoContext(payload.question) || shouldContinueRepoContextFromHistory(payload.chatHistory);
+  const useJobContext = shouldUseJobContext(payload.question) || shouldContinueJobContextFromHistory(payload.chatHistory);
+  const useResumeContext = shouldUseResumeContext(payload.question);
+
+  if (!useRepoContext && !useJobContext && !useResumeContext) {
+    return `Here is a normal draft reply to "${payload.question}". Tell me what direction you want, and I can make it more concise, technical, or detailed.`;
+  }
+
   return [
-    `Here is a grounded draft for the question: \"${payload.question}\".`,
+    `## Answer`,
     "",
-    "Based on the resume context and the job description, I would answer by focusing on the most relevant experience, the strongest matching project, and the skills that directly support the role requirements.",
+    useJobContext
+      ? "I considered the job profile because you explicitly asked for role-based grounding."
+      : "I answered normally and only used the background context that your question directly called for.",
     "",
-    "To make this stronger, keep the answer tied to specific achievements from your resume and relate them directly to the role's expectations.",
-    ...(payload.scrapedContext ? ["", "P.S. I also analyzed your GitHub/Portfolio and found several projects that could strengthen this answer further."] : []),
+    `Question: "${payload.question}"`,
+    "",
+    ...(useResumeContext || (useRepoContext && payload.githubContext) || useJobContext ? ["## Context Used"] : []),
+    ...(useResumeContext ? ["- Resume context"] : []),
+    ...(useRepoContext && payload.githubContext ? ["- GitHub project context"] : []),
+    ...(useJobContext ? ["- Job description context"] : []),
   ].join("\n");
 }
 
@@ -136,27 +116,49 @@ function buildProfileSection(profile: ProfileData | undefined): string {
 
 function buildMessages(payload: NormalizedAskPayload) {
   const profileSection = buildProfileSection(payload.profile);
+  const includeRepoContext = shouldUseRepoContext(payload.question) || shouldContinueRepoContextFromHistory(payload.chatHistory);
+  const includeJobContext = shouldUseJobContext(payload.question) || shouldContinueJobContextFromHistory(payload.chatHistory);
+  const includeResumeContext = shouldUseResumeContext(payload.question) || includeJobContext;
   const userParts = [
-    `Resume Content (Highlights Only):\n${payload.resumeText || "None provided"}`,
-    `Job Description (Target Role):\n${payload.jobDescription || "None provided"}`,
-    ...(payload.scrapedContext ? [`Live Scraped Context (GitHub/Portfolio - FULL REPO LIST):\n${payload.scrapedContext}`] : []),
-    ...(profileSection ? [profileSection] : []),
-    `User Question:\n${payload.question}`,
+    ...(includeResumeContext ? [`Resume Content (Highlights Only):\n${payload.resumeText || "None provided"}`] : []),
+    ...(includeJobContext ? [`Job Description (Target Role):\n${payload.jobDescription || "None provided"}`] : []),
+    ...(includeRepoContext && payload.githubContext ? [`GitHub Repository Context:\n${payload.githubContext}`] : []),
+    ...((includeResumeContext || includeRepoContext || includeJobContext) && profileSection ? [profileSection] : []),
+    ...(payload.chatHistory.length
+      ? [
+          "Recent Conversation History:",
+          ...payload.chatHistory.map((entry) => `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}`),
+        ]
+      : []),
+    `Current User Question:\n${payload.question}`,
   ];
 
   return [
     {
       role: "system" as const,
       content: [
-        "You are Rolequill, a helpful AI career assistant. You talk naturally and intelligently, exactly like ChatGPT.",
-        "Your role is to assist the user by utilizing the career data you have access to (Resume, GitHub, Portfolio).",
-        "CRITICAL RULES:",
-        "1. STRUCTURED FORMATTING: Always provide answers in a highly structured, premium manner. Use Markdown tables for project comparisons, bold headings for sections, and bullet points for technical highlights.",
-        "2. ARCHITECTURAL LAYOUT: Avoid long walls of text. Use a clean, 'at-a-glance' format. If listing projects, use a table showing [Project Name | Tech Stack | Core Impact].",
-        "3. ACCURACY FIRST: When the user asks about a specific type of project (e.g., 'EDA'), only mention projects that are explicitly identified as such in their README or description. DO NOT guess.",
-        "4. NEVER impersonate the user. Always refer to the user in the second person (e.g., 'Your resume shows...', 'You have built...').",
-        "5. If you cannot find a project matching their criteria, be honest. Tell them you've scanned their GitHub but don't see a clear match.",
-        "6. Keep the tone professional, supportive, and conversational.",
+        "You are Rolequill, a normal conversational assistant.",
+        "Talk naturally, like ChatGPT.",
+        "The user may have resume, job-description, portfolio, and GitHub project context available, but that context is background knowledge, not the main subject unless the user asks for it.",
+        "If the user says something casual like hello, hey, thanks, or asks a general question, respond briefly and normally. Do not force career analysis, tables, or structured recruiter-style output.",
+        "Do not use the job description unless the user explicitly asks you to consider the job, JD, role, job profile, or role fit.",
+        "However, if the recent conversation already established that the user wants the JD or role considered, maintain that context for direct follow-up questions in the same chat.",
+        "Use GitHub project context only when the question is about projects, architecture, GitHub, repositories, portfolio work, or similar technical work.",
+        "If the recent conversation is clearly about repos or projects, maintain that repo context for direct follow-up questions in the same chat.",
+        "When repo context is available, treat README content as the primary source of truth about what a project actually does.",
+        "Use descriptions, topics, and languages only as supporting metadata around the README.",
+        "Use resume context only when the question is about the user's background, skills, experience, or when the user explicitly asks for role-fit reasoning.",
+        "When the user does ask context-dependent questions, ground the answer in the available context and be accurate.",
+        "Use recent conversation history to resolve references like 'that', 'it', 'this role', or 'the pay'.",
+        "Do not guess project details that are not supported by the provided repo context.",
+        "Do not impersonate the user. Refer to the user in the second person.",
+        "Formatting rules:",
+        "1. Start with the direct answer in 1 to 2 sentences.",
+        "2. Then, if useful, add short sections with markdown headings like 'Why', 'Evidence', 'Best Projects', or 'Next Step'.",
+        "3. Prefer bullets over long paragraphs.",
+        "4. Keep paragraphs short, usually 1 to 3 lines.",
+        "5. Use tables only for explicit comparisons or ranked lists.",
+        "6. Do not bury the answer under setup or disclaimers.",
       ].join("\n"),
     },
     {
@@ -185,26 +187,13 @@ export async function POST(request: Request) {
     );
   }
 
-  // Scrape links if present to provide "live" context
-  let scrapedContext = "";
-  if (payload.profile) {
-    const linksToScrape = [
-      payload.profile.portfolioUrl,
-      payload.profile.githubUrl
-    ].filter(Boolean) as string[];
-    
-    if (linksToScrape.length > 0) {
-      const results = await Promise.all(linksToScrape.map(l => scrapeLink(l, question)));
-      scrapedContext = results.filter(Boolean).join("\n\n");
-    }
-  }
-
   const normalizedPayload: NormalizedAskPayload = {
     resumeText,
     jobDescription,
     question,
     profile: payload.profile ?? {},
-    scrapedContext
+    githubContext: payload.githubContext?.trim() ?? "",
+    chatHistory: Array.isArray(payload.chatHistory) ? payload.chatHistory.slice(-8) : [],
   };
 
   if (!process.env.GROQ_API_KEY) {
