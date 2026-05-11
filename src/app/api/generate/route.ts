@@ -1,4 +1,4 @@
-﻿import Groq from "groq-sdk";
+import Groq from "groq-sdk";
 import { NextResponse } from "next/server";
 import { createDrafts } from "@/lib/draft-generator";
 import { Draft, RolequillInput, RolequillResponse } from "@/lib/rolequill";

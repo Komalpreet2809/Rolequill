@@ -42,11 +42,17 @@ type SavedState = {
   resumeFileName?: string;
   resumeFileDataUrl?: string;
   resumeMimeType?: string;
+  jobDescription?: string;
   profile?: ProfileData;
 };
 
 function storageKey(email: string) {
   return `rolequill_dashboard_${email}`;
+}
+
+function writeSavedState(email: string, state: SavedState) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(storageKey(email), JSON.stringify(state));
 }
 
 function readSavedState(email: string): SavedState | null {
@@ -251,7 +257,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
   const [resumeFileName, setResumeFileName] = useState(savedState?.resumeFileName ?? "");
   const [resumeFileDataUrl, setResumeFileDataUrl] = useState(savedState?.resumeFileDataUrl ?? "");
   const [resumeMimeType, setResumeMimeType] = useState(savedState?.resumeMimeType ?? "");
-  const [jobDescription, setJobDescription] = useState("");
+  const [jobDescription, setJobDescription] = useState(savedState?.jobDescription ?? "");
   const [portfolioUrl, setPortfolioUrl] = useState(savedState?.profile?.portfolioUrl ?? "");
   const [linkedinUrl, setLinkedinUrl] = useState(savedState?.profile?.linkedinUrl ?? "");
   const [githubUrl, setGithubUrl] = useState(savedState?.profile?.githubUrl ?? "");
@@ -262,6 +268,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
   const [message, setMessage] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [askError, setAskError] = useState<string | null>(null);
+  const [jobDescriptionMessage, setJobDescriptionMessage] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState<{ id: string; status: "copied" | "error" } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
@@ -285,10 +292,11 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
       resumeFileName,
       resumeFileDataUrl,
       resumeMimeType,
+      jobDescription,
       profile: { portfolioUrl, linkedinUrl, githubUrl, twitterUrl },
     };
 
-    localStorage.setItem(storageKey(userEmail), JSON.stringify(state));
+    writeSavedState(userEmail, state);
   }, [
     mounted,
     userEmail,
@@ -296,6 +304,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
     resumeFileName,
     resumeFileDataUrl,
     resumeMimeType,
+    jobDescription,
     portfolioUrl,
     linkedinUrl,
     githubUrl,
@@ -607,6 +616,27 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
     }
   }
 
+  function handleSaveJobDescription() {
+    const trimmedJobDescription = jobDescription.trim();
+
+    if (!trimmedJobDescription) {
+      setJobDescriptionMessage("Paste a job description before continuing.");
+      return;
+    }
+
+    writeSavedState(userEmail, {
+      resumeText,
+      resumeFileName,
+      resumeFileDataUrl,
+      resumeMimeType,
+      jobDescription: trimmedJobDescription,
+      profile: { portfolioUrl, linkedinUrl, githubUrl, twitterUrl },
+    });
+    setJobDescription(trimmedJobDescription);
+    setJobDescriptionMessage("Job description saved locally. Continuing to chat.");
+    document.getElementById("chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   if (!mounted) return null;
 
   return (
@@ -687,6 +717,18 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">Job description</p>
               <h2 className="mt-4 font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950">Paste the role brief.</h2>
               <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} rows={10} placeholder="Paste the full JD here. This is what the GitHub scanner will rank your projects against." className="mt-6 w-full rounded-[2rem] border border-stone-200 bg-stone-50/80 px-5 py-5 text-sm leading-7 text-stone-900 outline-none transition focus:border-stone-500 focus:bg-white" />
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm leading-7 text-stone-600">Save the pasted JD to this browser, then jump straight to chat.</p>
+                <button
+                  type="button"
+                  onClick={handleSaveJobDescription}
+                  disabled={!hasJobDescription}
+                  className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800 disabled:bg-stone-400"
+                >
+                  Save and continue
+                </button>
+              </div>
+              {jobDescriptionMessage ? <p className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700">{jobDescriptionMessage}</p> : null}
             </section>
 
             <section className="flex flex-1 flex-col rounded-[2.4rem] border border-white/70 bg-white/76 p-7 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:p-8">
