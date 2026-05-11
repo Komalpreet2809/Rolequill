@@ -9,64 +9,111 @@
 </p>
 
 <p align="center">
-  Rolequill helps you turn your resume, GitHub repos, and target JD into grounded chat answers and tailored application drafts.
+  Rolequill turns your resume, synced repositories, and target JD into grounded chat answers, project rankings, and tailored application drafts.
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> |
+  <a href="#features">Features</a> |
+  <a href="#product-flow">Flow</a> |
+  <a href="#getting-started">Setup</a> |
+  <a href="#deployment">Deployment</a>
+</p>
+
+<p align="center">
+  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-111111?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-111111?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-Ready-111111?style=for-the-badge&logo=typescript&logoColor=3178C6" />
+  <img alt="Groq" src="https://img.shields.io/badge/Groq-Grounded%20LLM-111111?style=for-the-badge" />
+  <img alt="NextAuth" src="https://img.shields.io/badge/Auth-GitHub%20OAuth-111111?style=for-the-badge" />
 </p>
 
 <p align="center">
   <img src="./demo.png" alt="Rolequill product demo" />
 </p>
 
+> Rolequill is built for applicants who want answers tied to actual work, not polished hallucinations.
+
 ## Overview
 
-Rolequill is a Next.js app for technical job applicants who want better answers than generic AI output.
+Most career tools start with a prompt box and a generic model response.
 
-Instead of responding from a blank prompt, it works from:
+Rolequill is structured differently. It builds answers from:
 
 - your resume text
-- your saved profile links
+- saved profile links
 - the current job description
 - synced GitHub repository context
 - recent chat history
 
-The result is a workspace that can:
+That gives you a workspace that can:
 
-- answer role-fit questions with context
-- rank relevant projects for a target role
-- generate multiple grounded application drafts
-- keep the flow tied to your actual work instead of invented claims
+- explain why a project fits a role
+- rank repositories against a target prompt
+- answer follow-up questions with retained context
+- generate application drafts without inventing experience
 
 ## Features
 
-- GitHub OAuth sign-in with NextAuth
-- Resume parsing and local session persistence
-- Job description save-and-continue flow
-- Context-aware chat backed by Groq
-- Repo ranking against a prompt or JD
-- Draft generation for application-style answers
-- Responsive landing page and dashboard
-- Dark/light theme toggle
+| Area | What Rolequill does |
+|---|---|
+| Context grounding | Uses resume, JD, profile links, repo metadata, and README excerpts |
+| GitHub sync | Pulls repositories and keeps a shortlist for role-based analysis |
+| Chat | Supports grounded Q&A with retry-on-compact-context behavior |
+| Drafting | Generates multiple job-application style drafts from the same source context |
+| Persistence | Saves local browser state for resume, profile links, and JD flow |
+| UX | Responsive landing page, theme toggle, and mobile-friendly dashboard |
+
+## Why It Feels Different
+
+<table>
+  <tr>
+    <td width="33%">
+      <strong>Grounded Answers</strong><br />
+      Repo README content is treated as the primary source of truth, which keeps project claims tighter and more defensible.
+    </td>
+    <td width="33%">
+      <strong>Role-Aware Chat</strong><br />
+      The assistant only pulls JD or repo context when the question calls for it, instead of forcing every answer into recruiter mode.
+    </td>
+    <td width="33%">
+      <strong>Project Shortlisting</strong><br />
+      Instead of dumping your whole profile into a prompt, Rolequill narrows the repo set and reasons from the strongest matches.
+    </td>
+  </tr>
+</table>
 
 ## Product Flow
 
-1. Sign in with GitHub.
-2. Add your resume and profile links.
-3. Paste the target job description.
-4. Sync GitHub repositories.
-5. Ask questions like `best projects for this role` or `why does this project fit the JD`.
-6. Generate tailored application drafts from the same context.
+```text
+GitHub Sign-In
+      ->
+Resume + Profile Links
+      ->
+Job Description
+      ->
+Repo Sync + Shortlist
+      ->
+Grounded Chat + Draft Generation
+```
+
+Typical prompts:
+
+- `best projects for this role`
+- `why does this project fit the JD`
+- `can I replace this project with another one`
+- `summarize this job profile`
 
 ## Tech Stack
 
-- Next.js 16
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- NextAuth
-- Groq SDK
-- Cheerio
-- React Markdown
-- remark-gfm
-- unpdf
+| Layer | Tools |
+|---|---|
+| App | Next.js 16, React 19, TypeScript |
+| Styling | Tailwind CSS 4 |
+| Auth | NextAuth with GitHub OAuth |
+| Model layer | Groq SDK |
+| Content parsing | Cheerio, unpdf |
+| Rendering | React Markdown, remark-gfm |
 
 ## Environment Variables
 
@@ -94,29 +141,18 @@ For production:
 - Homepage URL: `https://rolequill.komalpreet.me`
 - Authorization callback URL: `https://rolequill.komalpreet.me/api/auth/callback/github`
 
-If you need both local and production auth, keep separate GitHub OAuth apps.
+If you need both local and production auth, use separate GitHub OAuth apps.
 
 ## Getting Started
 
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Start the dev server:
-
-```bash
 npm run dev
 ```
 
-Open:
+Open `http://localhost:3000`
 
-```text
-http://localhost:3000
-```
-
-## Scripts
+### Scripts
 
 ```bash
 npm run dev
@@ -127,32 +163,18 @@ npm run lint
 
 ## API Routes
 
-### `POST /api/ask`
+| Route | Purpose |
+|---|---|
+| `POST /api/ask` | Contextual Q&A using resume, JD, repo context, and chat history |
+| `POST /api/generate` | Generates four grounded application drafts |
+| `POST /api/github/analyze` | Ranks synced repositories against a target prompt or role |
+| `POST /api/github/talking-points` | Produces project talking points from repo context |
 
-Contextual Q&A using:
+Implementation notes:
 
-- resume text
-- job description
-- GitHub repo context
-- recent chat history
-
-Notes:
-
-- uses `openai/gpt-oss-20b` by default
-- retries once with compacted context before failing
-- returns a local mock mode if `GROQ_API_KEY` is missing
-
-### `POST /api/generate`
-
-Generates four grounded application drafts from candidate and role inputs.
-
-### `POST /api/github/analyze`
-
-Ranks synced repositories against a target prompt or job context.
-
-### `POST /api/github/talking-points`
-
-Builds project talking points from repository context.
+- default model: `openai/gpt-oss-20b`
+- `/api/ask` retries once with compacted context
+- missing `GROQ_API_KEY` triggers local fallback behavior
 
 ## Project Structure
 
@@ -188,9 +210,9 @@ Also make sure the GitHub OAuth callback URL matches the deployed domain exactly
 
 ## Notes
 
-- Some local fallback behavior is intentional when model credentials are missing.
-- Chat quality depends heavily on the quality of the synced repo README content.
-- The app is optimized around grounded drafting, not open-ended chatbot behavior.
+- Chat quality depends heavily on the quality of synced repo README content.
+- Local fallback behavior is intentional when model credentials are missing.
+- The app is optimized for grounded drafting, not open-ended chatbot behavior.
 
 ## Author
 
