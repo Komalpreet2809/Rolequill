@@ -114,9 +114,6 @@ npm run dev
 
 ---
 
-## 📜 License
-
-Distributed under the ISC License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
