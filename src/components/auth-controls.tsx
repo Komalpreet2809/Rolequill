@@ -30,10 +30,12 @@ export function GitHubSignInButton({ disabled = false }: GitHubSignInButtonProps
       type="button"
       onClick={() => signIn("github")}
       disabled={disabled}
-      className="inline-flex h-[38px] w-[120px] items-center justify-center gap-2 rounded-full bg-stone-950 px-3 text-[10px] font-bold text-stone-50 shadow-[0_12px_30px_rgba(28,25,23,0.12)] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
+      aria-label="Sign in with GitHub"
+      title="Sign in with GitHub"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-stone-950 text-[10px] font-bold text-stone-50 shadow-[0_12px_30px_rgba(28,25,23,0.12)] transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500 sm:h-[38px] sm:w-auto sm:min-w-[120px] sm:gap-2 sm:px-3"
     >
       <GitHubIcon />
-      <span className="whitespace-nowrap">GitHub</span>
+      <span className="hidden whitespace-nowrap sm:inline">GitHub</span>
     </button>
   );
 }
@@ -43,10 +45,12 @@ export function SignOutButton() {
     <button
       type="button"
       onClick={() => signOut()}
-      className="inline-flex h-[38px] w-[120px] items-center justify-center gap-2 rounded-full bg-stone-950 px-3 text-[10px] font-bold text-stone-50 shadow-[0_14px_32px_rgba(28,25,23,0.16)] transition hover:bg-stone-800"
+      aria-label="Sign out"
+      title="Sign out"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-stone-950 text-[10px] font-bold text-stone-50 shadow-[0_14px_32px_rgba(28,25,23,0.16)] transition hover:bg-stone-800 sm:h-[38px] sm:w-auto sm:min-w-[120px] sm:gap-2 sm:px-3"
     >
       <SignOutIcon />
-      <span className="whitespace-nowrap">Sign out</span>
+      <span className="hidden whitespace-nowrap sm:inline">Sign out</span>
     </button>
   );
 }

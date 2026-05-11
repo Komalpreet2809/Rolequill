@@ -644,20 +644,20 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
 
   return (
     <>
-      <section id="context" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-stretch px-6 py-16 sm:px-10 lg:px-12">
-        <div className="grid w-full gap-8 lg:grid-cols-[0.96fr_1.04fr]">
+      <section id="context" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-stretch px-3 py-8 sm:px-6 sm:py-14 lg:px-12 lg:py-16">
+        <div className="grid w-full gap-6 lg:grid-cols-[0.96fr_1.04fr] lg:gap-8">
           <div className="flex flex-col gap-6">
-            <aside className="space-y-6 rounded-[2.4rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,16,14,0.96)_0%,rgba(28,25,23,0.98)_100%)] p-6 text-stone-100 shadow-[0_28px_80px_rgba(28,25,23,0.2)]">
-              <div className="flex items-center gap-4 rounded-[1.8rem] border border-white/10 bg-black/20 p-5">
-                {userImage ? <Image src={userImage} alt={userName} width={72} height={72} unoptimized className="h-18 w-18 rounded-full object-cover" /> : <div className="flex h-18 w-18 items-center justify-center rounded-full bg-stone-800 text-2xl font-semibold text-stone-100">{userName.slice(0, 1).toUpperCase()}</div>}
+            <aside className="space-y-4 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,16,14,0.96)_0%,rgba(28,25,23,0.98)_100%)] p-3 text-stone-100 shadow-[0_28px_80px_rgba(28,25,23,0.2)] sm:space-y-6 sm:rounded-[2.4rem] sm:p-6">
+              <div className="flex items-center gap-3 rounded-[1.25rem] border border-white/10 bg-black/20 p-3 sm:gap-4 sm:rounded-[1.8rem] sm:p-5">
+                {userImage ? <Image src={userImage} alt={userName} width={72} height={72} unoptimized className="h-12 w-12 rounded-full object-cover sm:h-[72px] sm:w-[72px]" /> : <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-800 text-lg font-semibold text-stone-100 sm:h-[72px] sm:w-[72px] sm:text-2xl">{userName.slice(0, 1).toUpperCase()}</div>}
                 <div className="min-w-0">
                   <p className="text-[11px] uppercase tracking-[0.24em] text-stone-500">Signed in as</p>
-                  <p className="mt-1 truncate text-xl font-semibold text-white">{userName}</p>
-                  <p className="truncate text-sm text-stone-400">{userEmail}</p>
+                  <p className="mt-1 truncate text-base font-semibold text-white sm:text-xl">{userName}</p>
+                  <p className="truncate text-xs text-stone-400 sm:text-sm">{userEmail}</p>
                 </div>
               </div>
 
-              <div className="rounded-[1.8rem] border border-white/10 bg-white/6 p-5">
+              <div className="rounded-[1.25rem] border border-white/10 bg-white/6 p-3 sm:rounded-[1.8rem] sm:p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">Profile links</p>
                 <div className="mt-4 grid gap-3">
                   <ProfileInput label="Portfolio" value={portfolioUrl} placeholder="https://yoursite.com" onChange={setPortfolioUrl} />
@@ -667,19 +667,19 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                 </div>
               </div>
 
-              <div className="rounded-[1.8rem] border border-white/10 bg-white/6 p-5">
+              <div className="rounded-[1.25rem] border border-white/10 bg-white/6 p-3 sm:rounded-[1.8rem] sm:p-5">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-400">Resume</p>
-                    <h3 className="mt-2 font-serif text-3xl leading-none tracking-[-0.04em] text-white">{hasResume ? resumeFileName : "Upload your resume"}</h3>
+                    <h3 className="mt-2 break-words font-serif text-xl leading-none tracking-[-0.04em] text-white sm:text-3xl">{hasResume ? resumeFileName : "Upload your resume"}</h3>
                   </div>
-                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-950 transition hover:bg-stone-200">
+                  <label className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-stone-950 transition hover:bg-stone-200 sm:px-4 sm:py-2 sm:text-sm">
                     {isUploading ? "Uploading..." : hasResume ? "Replace" : "Choose"}
                     <input type="file" accept=".pdf,.txt,.md,.rtf" onChange={handleResumeUpload} disabled={isUploading} className="hidden" />
                   </label>
                 </div>
                 {hasResume ? (
-                  <button type="button" onClick={() => (canOpenResumeFile ? setIsPreviewOpen(true) : setPreviewMessageOpen(true))} className="mt-4 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-sm font-semibold text-white">
+                  <button type="button" onClick={() => (canOpenResumeFile ? setIsPreviewOpen(true) : setPreviewMessageOpen(true))} className="mt-4 rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm">
                     Preview resume
                   </button>
                 ) : null}
@@ -687,28 +687,28 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
               </div>
             </aside>
 
-            <section className="flex-1 rounded-[2.4rem] border border-white/70 bg-white/76 p-7 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:p-8">
-              <div className="flex flex-col gap-5">
+            <section className="flex-1 rounded-[1.6rem] border border-white/70 bg-white/76 p-4 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:rounded-[2.4rem] sm:p-8">
+              <div className="flex flex-col gap-4 sm:gap-5">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">GitHub scanner</p>
-                  <h2 className="mt-4 font-serif text-4xl leading-none tracking-[-0.05em] text-stone-950 sm:text-5xl">Rank your repositories.</h2>
-                  <p className="mt-4 max-w-xl text-base leading-8 text-stone-700">This now uses the real GitHub API from your OAuth session instead of scraping GitHub HTML.</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 sm:text-sm sm:tracking-[0.28em]">GitHub scanner</p>
+                  <h2 className="mt-3 font-serif text-[1.75rem] leading-none tracking-[-0.05em] text-stone-950 sm:mt-4 sm:text-5xl">Rank your repositories.</h2>
+                  <p className="mt-3 max-w-xl text-[13px] leading-6 text-stone-700 sm:mt-4 sm:text-base sm:leading-8">This now uses the real GitHub API from your OAuth session instead of scraping GitHub HTML.</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <button type="button" onClick={handleSyncGitHub} disabled={isSyncingRepos} className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800 disabled:bg-stone-400">{isSyncingRepos ? "Syncing..." : githubRepos.length ? "Resync GitHub" : "Sync GitHub"}</button>
+                  <button type="button" onClick={handleSyncGitHub} disabled={isSyncingRepos} className="rounded-full bg-stone-950 px-4 py-2.5 text-xs font-semibold text-stone-50 transition hover:bg-stone-800 disabled:bg-stone-400 sm:px-5 sm:py-3 sm:text-sm">{isSyncingRepos ? "Syncing..." : githubRepos.length ? "Resync GitHub" : "Sync GitHub"}</button>
                 </div>
               </div>
 
               <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-3">
-                <div className="flex h-full flex-col rounded-[1.7rem] border border-stone-200 bg-stone-50/80 p-5"><p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Repos synced</p><p className="mt-3 text-3xl font-semibold text-stone-950">{githubRepos.length || "0"}</p></div>
-                <div className="flex h-full flex-col rounded-[1.7rem] border border-stone-200 bg-stone-50/80 p-5"><p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Account</p><p className="mt-3 break-words text-base font-semibold leading-7 text-stone-950 sm:text-lg">{githubAccount?.login ?? "Not synced"}</p></div>
-                <div className="flex h-full flex-col rounded-[1.7rem] border border-stone-200 bg-stone-50/80 p-5"><p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Last sync</p><p className="mt-3 break-words text-sm font-medium leading-6 text-stone-700">{githubFetchedAt ? new Date(githubFetchedAt).toLocaleString() : "Not yet"}</p></div>
+                <div className="flex h-full flex-col rounded-[1.25rem] border border-stone-200 bg-stone-50/80 p-4 sm:rounded-[1.7rem] sm:p-5"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 sm:text-[11px] sm:tracking-[0.24em]">Repos synced</p><p className="mt-2 text-2xl font-semibold text-stone-950 sm:mt-3 sm:text-3xl">{githubRepos.length || "0"}</p></div>
+                <div className="flex h-full flex-col rounded-[1.25rem] border border-stone-200 bg-stone-50/80 p-4 sm:rounded-[1.7rem] sm:p-5"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 sm:text-[11px] sm:tracking-[0.24em]">Account</p><p className="mt-2 break-words text-sm font-semibold leading-6 text-stone-950 sm:mt-3 sm:text-lg sm:leading-7">{githubAccount?.login ?? "Not synced"}</p></div>
+                <div className="flex h-full flex-col rounded-[1.25rem] border border-stone-200 bg-stone-50/80 p-4 sm:rounded-[1.7rem] sm:p-5"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 sm:text-[11px] sm:tracking-[0.24em]">Last sync</p><p className="mt-2 break-words text-xs font-medium leading-5 text-stone-700 sm:mt-3 sm:text-sm sm:leading-6">{githubFetchedAt ? new Date(githubFetchedAt).toLocaleString() : "Not yet"}</p></div>
               </div>
 
               {syncError ? <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{syncError}</p> : null}
               {analysisError ? <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{analysisError}</p> : null}
               {analysisMessage ? <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{analysisMessage}</p> : null}
-              <div className="mt-8 rounded-[1.8rem] border border-stone-200 bg-stone-50/80 p-5">
+              <div className="mt-6 rounded-[1.25rem] border border-stone-200 bg-stone-50/80 p-4 sm:mt-8 sm:rounded-[1.8rem] sm:p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Repository results</p>
                 <p className="mt-3 text-sm leading-7 text-stone-700">Project cards stay on the right. Sync here, rank here, then review the shortlist in the next panel.</p>
               </div>
@@ -716,16 +716,16 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
           </div>
 
           <div className="flex flex-col gap-8">
-            <section className="rounded-[2.4rem] border border-white/70 bg-white/76 p-7 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:p-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">Job description</p>
-              <h2 className="mt-4 font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950">Paste the role brief.</h2>
-              <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} rows={10} placeholder="Paste the full JD here. This is what the GitHub scanner will rank your projects against." className="mt-6 w-full rounded-[2rem] border border-stone-200 bg-stone-50/80 px-5 py-5 text-sm leading-7 text-stone-900 outline-none transition focus:border-stone-500 focus:bg-white" />
+            <section className="rounded-[1.6rem] border border-white/70 bg-white/76 p-4 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:rounded-[2.4rem] sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 sm:text-sm sm:tracking-[0.28em]">Job description</p>
+              <h2 className="mt-3 font-serif text-[1.75rem] leading-none tracking-[-0.05em] text-stone-950 sm:mt-4 sm:text-5xl">Paste the role brief.</h2>
+              <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} rows={10} placeholder="Paste the full JD here. This is what the GitHub scanner will rank your projects against." className="mt-5 w-full rounded-[1.5rem] border border-stone-200 bg-stone-50/80 px-4 py-4 text-[13px] leading-6 text-stone-900 outline-none transition focus:border-stone-500 focus:bg-white sm:mt-6 sm:rounded-[2rem] sm:px-5 sm:py-5 sm:text-sm sm:leading-7" />
               <div className="mt-5 flex justify-end">
                 <button
                   type="button"
                   onClick={handleSaveJobDescription}
                   disabled={!hasJobDescription}
-                  className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50 transition hover:bg-stone-800 disabled:bg-stone-400"
+                  className="w-full rounded-full bg-stone-950 px-4 py-2.5 text-xs font-semibold text-stone-50 transition hover:bg-stone-800 disabled:bg-stone-400 sm:w-auto sm:px-5 sm:py-3 sm:text-sm"
                 >
                   Save and continue
                 </button>
@@ -733,20 +733,20 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
               {jobDescriptionMessage ? <p className="mt-4 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700">{jobDescriptionMessage}</p> : null}
             </section>
 
-            <section className="flex flex-1 flex-col rounded-[2.4rem] border border-white/70 bg-white/76 p-7 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:p-8">
+            <section className="flex flex-1 flex-col rounded-[1.6rem] border border-white/70 bg-white/76 p-4 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur sm:rounded-[2.4rem] sm:p-8">
               <div>
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">Repository matches</p>
-                  <h3 className="mt-4 font-serif text-4xl leading-none tracking-[-0.05em] text-stone-950 sm:text-5xl">Review the shortlist.</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 sm:text-sm sm:tracking-[0.28em]">Repository matches</p>
+                  <h3 className="mt-3 font-serif text-[1.75rem] leading-none tracking-[-0.05em] text-stone-950 sm:mt-4 sm:text-5xl">Review the shortlist.</h3>
                 </div>
               </div>
 
               <div className="mt-8 flex-1">
                 {rankedRepos.length ? (
-                  <div className="max-h-[42rem] overflow-y-auto pr-2">
+                  <div className="max-h-[36rem] overflow-y-auto pr-1 sm:max-h-[42rem] sm:pr-2">
                     <div className="space-y-4">
                       {rankedRepos.map(({ repo, match }) => (
-                        <article key={repo.id} className="rounded-[2rem] border border-stone-200 bg-white p-5 text-stone-900 transition">
+                        <article key={repo.id} className="rounded-[1.25rem] border border-stone-200 bg-white p-3 text-stone-900 transition sm:rounded-[2rem] sm:p-5">
                           <div className="min-w-0 flex-1 overflow-hidden">
                             <div className="flex items-start justify-between gap-4">
                               {match ? <span className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1 text-xs font-semibold text-stone-600">Matched</span> : <span />}
@@ -760,8 +760,8 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                                 <XIcon />
                               </button>
                             </div>
-                            <h3 className="font-serif text-3xl leading-none tracking-[-0.04em]"><a href={repo.url} target="_blank" rel="noreferrer" className="hover:underline">{repo.fullName}</a></h3>
-                            {repo.description ? <p className="mt-3 text-sm leading-7 text-stone-700">{repo.description}</p> : null}
+                            <h3 className="break-words font-serif text-xl leading-none tracking-[-0.04em] sm:text-3xl"><a href={repo.url} target="_blank" rel="noreferrer" className="hover:underline">{repo.fullName}</a></h3>
+                            {repo.description ? <p className="mt-3 text-[13px] leading-6 text-stone-700 sm:text-sm sm:leading-7">{repo.description}</p> : null}
                             {match ? (
                               <div className="mt-4 max-h-28 overflow-y-auto pr-2 text-stone-700">
                                 <ul className="space-y-2 text-sm leading-7">
@@ -783,9 +783,9 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                   </div>
                 ) : (
                   !githubRepos.length ? (
-                    <div className="h-full rounded-[2rem] border border-dashed border-stone-300 bg-stone-50/70 p-6 text-stone-700">
+                    <div className="h-full rounded-[1.6rem] border border-dashed border-stone-300 bg-stone-50/70 p-5 text-stone-700 sm:rounded-[2rem] sm:p-6">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-stone-500">Before sync</p>
-                      <h4 className="mt-3 font-serif text-3xl leading-none tracking-[-0.04em] text-stone-950">Your repo shortlist will appear here.</h4>
+                      <h4 className="mt-3 font-serif text-2xl leading-none tracking-[-0.04em] text-stone-950 sm:text-3xl">Your repo shortlist will appear here.</h4>
                       <p className="mt-4 max-w-xl text-sm leading-7">After you sync GitHub, this panel fills with repositories pulled from your account. Chat will answer from the repos that remain here.</p>
                       <div className="mt-6 grid items-stretch gap-4 lg:grid-cols-3">
                         <div className="flex h-full flex-col rounded-[1.6rem] border border-stone-200 bg-white p-4">
@@ -815,12 +815,12 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
         </div>
       </section>
 
-      <section id="chat" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-start px-6 py-16 sm:px-10 lg:px-12">
-        <div className="w-full overflow-hidden rounded-[2.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,16,14,0.98)_0%,rgba(30,27,24,0.98)_100%)] p-4 text-stone-100 shadow-[0_32px_90px_rgba(28,25,23,0.24)] sm:p-6">
+      <section id="chat" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-start px-3 py-8 sm:px-6 sm:py-14 lg:px-12 lg:py-16">
+        <div className="w-full overflow-hidden rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(18,16,14,0.98)_0%,rgba(30,27,24,0.98)_100%)] p-2.5 text-stone-100 shadow-[0_32px_90px_rgba(28,25,23,0.24)] sm:rounded-[2.6rem] sm:p-6">
           <div className="grid w-full items-stretch gap-6 lg:grid-cols-[minmax(18rem,24rem)_minmax(0,1fr)]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/6 p-6">
+            <div className="rounded-[1.25rem] border border-white/10 bg-white/6 p-3 sm:rounded-[2rem] sm:p-6">
               <div className="flex items-center justify-between gap-4">
-                <p className="text-sm font-semibold uppercase tracking-[0.32em] text-stone-400">Chat section</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-400 sm:text-sm sm:tracking-[0.32em]">Chat section</p>
                 <button
                   type="button"
                   onClick={handleNewChat}
@@ -829,18 +829,18 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                   New chat
                 </button>
               </div>
-              <h2 className="mt-4 font-serif text-5xl leading-none tracking-[-0.05em] text-white">Ask with evidence.</h2>
-              {message ? <p className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/6 px-4 py-4 text-sm leading-7 text-stone-300">{message}</p> : null}
-              <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/6 p-4">
+              <h2 className="mt-3 font-serif text-[1.75rem] leading-none tracking-[-0.05em] text-white sm:mt-4 sm:text-5xl">Ask with evidence.</h2>
+              {message ? <p className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/6 px-3 py-3 text-[13px] leading-6 text-stone-300 sm:mt-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-sm sm:leading-7">{message}</p> : null}
+              <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/6 p-3 sm:mt-5 sm:rounded-[1.5rem] sm:p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[11px] uppercase tracking-[0.22em] text-stone-500">Chat history</p>
                   <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-stone-300">{chatSessions.length}</span>
                 </div>
-                <div className="mt-4 max-h-64 space-y-2 overflow-y-auto pr-1">
+                <div className="mt-4 max-h-52 space-y-2 overflow-y-auto pr-1 sm:max-h-64">
                   {chatSessions.map((session) => (
                     <div
                       key={session.id}
-                      className={`rounded-[1.2rem] border px-3 py-3 transition ${
+                      className={`rounded-[1rem] border px-3 py-2.5 transition sm:rounded-[1.2rem] sm:py-3 ${
                         session.id === activeChatId
                           ? "border-white/20 bg-white/12 text-white"
                           : "border-white/8 bg-black/10 text-stone-300 hover:border-white/14 hover:bg-white/8"
@@ -873,20 +873,20 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
               </div>
             </div>
 
-            <div className="min-w-0 overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,241,231,0.98)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
-              <div className="max-h-[34rem] min-h-[28rem] overflow-y-auto px-6 py-8">
+            <div className="min-w-0 overflow-hidden rounded-[1.25rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,241,231,0.98)_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] sm:rounded-[2rem]">
+              <div className="max-h-[24rem] min-h-[16rem] overflow-y-auto px-3 py-4 sm:max-h-[34rem] sm:min-h-[28rem] sm:px-6 sm:py-8">
                 {chatEntries.length ? (
                   <div className="space-y-6">
                     {chatEntries.map((entry) => (
                       <div key={entry.id} className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <div className={`${entry.role === "user" ? "max-w-[86%]" : "w-full"} space-y-2`}>
-                          <div className={`rounded-[1.8rem] px-5 py-4 ${entry.role === "user" ? "bg-stone-950 text-stone-50" : "border border-stone-200 bg-white text-stone-700"}`}>
+                        <div className={`${entry.role === "user" ? "max-w-full sm:max-w-[86%]" : "w-full"} space-y-2`}>
+                          <div className={`rounded-[1.1rem] px-3 py-2.5 sm:rounded-[1.8rem] sm:px-5 sm:py-4 ${entry.role === "user" ? "bg-stone-950 text-stone-50" : "border border-stone-200 bg-white text-stone-700"}`}>
                             {entry.role === "assistant" ? (
-                              <div className="prose prose-stone max-w-none text-sm leading-7">
+                              <div className="prose prose-stone max-w-none break-words text-[13px] leading-6 overflow-x-auto sm:text-sm sm:leading-7">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{entry.content}</ReactMarkdown>
                               </div>
                             ) : (
-                              <p className="whitespace-pre-wrap text-sm leading-7">{entry.content}</p>
+                              <p className="whitespace-pre-wrap break-words text-[13px] leading-6 sm:text-sm sm:leading-7">{entry.content}</p>
                             )}
                           </div>
                           <div className={`flex ${entry.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -922,12 +922,12 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                     ))}
                   </div>
                 ) : (
-                  <div className="flex min-h-[22rem] flex-col items-center justify-center text-center">
-                    <div className="flex h-20 w-20 items-center justify-center p-1">
+                  <div className="flex min-h-[14rem] flex-col items-center justify-center text-center sm:min-h-[22rem]">
+                    <div className="flex h-14 w-14 items-center justify-center p-1 sm:h-20 sm:w-20">
                       <Image src="/logo.png" alt="Rolequill Logo" width={80} height={80} className="h-full w-full object-contain mix-blend-multiply" />
                     </div>
-                    <h3 className="mt-6 font-serif text-5xl leading-none tracking-[-0.05em] text-stone-900">Rolequill chat</h3>
-                    <p className="mt-4 max-w-md text-sm leading-7 text-stone-600">Sync GitHub, rank your repos, then ask from a stronger evidence base.</p>
+                    <h3 className="mt-5 font-serif text-[1.75rem] leading-none tracking-[-0.05em] text-stone-900 sm:mt-6 sm:text-5xl">Rolequill chat</h3>
+                    <p className="mt-3 max-w-md text-[13px] leading-6 text-stone-600 sm:mt-4 sm:text-sm sm:leading-7">Sync GitHub, rank your repos, then ask from a stronger evidence base.</p>
                   </div>
                 )}
 
@@ -936,13 +936,13 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
 
               <div className="border-t border-stone-200 bg-[#f4ede2] px-4 py-4 sm:px-5">
                 {askError ? <p className="mb-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{askError}</p> : null}
-                <div className="rounded-[2rem] border border-stone-700/80 bg-[#211d18] p-3 shadow-[0_20px_40px_rgba(28,25,23,0.2)]">
-                  <div className="flex items-end gap-3">
-                    <label className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-stone-700 text-stone-300"><input type="file" accept=".pdf,.txt,.md,.rtf" onChange={handleResumeUpload} disabled={isUploading} className="hidden" />+</label>
+                <div className="rounded-[1.5rem] border border-stone-700/80 bg-[#211d18] p-2 shadow-[0_20px_40px_rgba(28,25,23,0.2)] sm:rounded-[2rem] sm:p-3">
+                  <div className="flex items-end gap-2 sm:gap-3">
+                    <label className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-stone-700 text-stone-300 sm:h-11 sm:w-11"><input type="file" accept=".pdf,.txt,.md,.rtf" onChange={handleResumeUpload} disabled={isUploading} className="hidden" />+</label>
                     <div className="flex-1">
-                      <textarea value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void handleAsk(); } }} rows={3} placeholder="Ask chat, or try: 5 best projects for a full stack role" className="min-h-[4.5rem] w-full resize-none bg-transparent px-1 py-1 text-sm leading-7 text-stone-50 outline-none placeholder:text-stone-500" />
+                      <textarea value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void handleAsk(); } }} rows={1} placeholder="5 best projects for ML Engineer" className="min-h-[2.25rem] w-full resize-none bg-transparent px-1 py-1 text-[13px] leading-5 text-stone-50 outline-none placeholder:text-[11px] placeholder:text-stone-500 sm:min-h-[4.5rem] sm:text-sm sm:leading-7 sm:placeholder:text-sm" />
                     </div>
-                    <button type="button" onClick={() => void handleAsk()} disabled={isAsking || !question.trim() || (!githubRepos.length && (!hasResume || !hasJobDescription))} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-stone-50 text-stone-950 disabled:bg-stone-500 disabled:text-stone-200">↗</button>
+                    <button type="button" onClick={() => void handleAsk()} disabled={isAsking || !question.trim() || (!githubRepos.length && (!hasResume || !hasJobDescription))} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-50 text-stone-950 disabled:bg-stone-500 disabled:text-stone-200 sm:h-11 sm:w-11">↗</button>
                   </div>
                 </div>
               </div>
@@ -951,8 +951,8 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
         </div>
       </section>
 
-      {isPreviewOpen && canOpenResumeFile ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/75 p-4 backdrop-blur-sm"><div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] border border-stone-300 bg-white shadow-[0_24px_80px_rgba(28,25,23,0.28)]"><button type="button" onClick={() => setIsPreviewOpen(false)} className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-700">X</button><div className="border-b border-stone-200 px-6 py-5"><p className="text-xs uppercase tracking-[0.24em] text-stone-500">Resume preview</p><p className="mt-2 text-base font-semibold text-stone-900">{resumeFileName}</p></div><div className="bg-stone-100 p-4">{isPdfResume ? <iframe src={resumeFileDataUrl} title="Saved resume preview" className="h-[75vh] w-full rounded-[1.25rem] bg-white" /> : <div className="flex h-[55vh] items-center justify-center rounded-[1.25rem] bg-white px-8 text-center text-sm leading-7 text-stone-600">This file format cannot be previewed inline in every browser.</div>}</div></div></div> : null}
-      {previewMessageOpen ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/75 p-4 backdrop-blur-sm"><div className="w-full max-w-lg rounded-[2rem] border border-stone-300 bg-white p-6 shadow-[0_24px_80px_rgba(28,25,23,0.28)]"><p className="text-xs uppercase tracking-[0.24em] text-stone-500">Preview unavailable</p><h3 className="mt-3 text-2xl font-semibold text-stone-950">This saved resume needs one refresh.</h3><p className="mt-4 text-sm leading-7 text-stone-700">Click Replace once to save the original file too, then the preview dialog will work.</p><div className="mt-6 flex justify-end"><button type="button" onClick={() => setPreviewMessageOpen(false)} className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50">Close</button></div></div></div> : null}
+      {isPreviewOpen && canOpenResumeFile ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/75 p-3 backdrop-blur-sm sm:p-4"><div className="relative w-full max-w-5xl overflow-hidden rounded-[1.6rem] border border-stone-300 bg-white shadow-[0_24px_80px_rgba(28,25,23,0.28)] sm:rounded-[2rem]"><button type="button" onClick={() => setIsPreviewOpen(false)} className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white text-stone-700 sm:right-4 sm:top-4 sm:h-10 sm:w-10">X</button><div className="border-b border-stone-200 px-4 py-4 sm:px-6 sm:py-5"><p className="text-xs uppercase tracking-[0.24em] text-stone-500">Resume preview</p><p className="mt-2 break-words text-base font-semibold text-stone-900">{resumeFileName}</p></div><div className="bg-stone-100 p-3 sm:p-4">{isPdfResume ? <iframe src={resumeFileDataUrl} title="Saved resume preview" className="h-[70vh] w-full rounded-[1rem] bg-white sm:h-[75vh] sm:rounded-[1.25rem]" /> : <div className="flex h-[50vh] items-center justify-center rounded-[1rem] bg-white px-6 text-center text-sm leading-7 text-stone-600 sm:h-[55vh] sm:rounded-[1.25rem] sm:px-8">This file format cannot be previewed inline in every browser.</div>}</div></div></div> : null}
+      {previewMessageOpen ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/75 p-3 backdrop-blur-sm sm:p-4"><div className="w-full max-w-lg rounded-[1.6rem] border border-stone-300 bg-white p-5 shadow-[0_24px_80px_rgba(28,25,23,0.28)] sm:rounded-[2rem] sm:p-6"><p className="text-xs uppercase tracking-[0.24em] text-stone-500">Preview unavailable</p><h3 className="mt-3 text-xl font-semibold text-stone-950 sm:text-2xl">This saved resume needs one refresh.</h3><p className="mt-4 text-sm leading-7 text-stone-700">Click Replace once to save the original file too, then the preview dialog will work.</p><div className="mt-6 flex justify-end"><button type="button" onClick={() => setPreviewMessageOpen(false)} className="rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold text-stone-50">Close</button></div></div></div> : null}
     </>
   );
 }
