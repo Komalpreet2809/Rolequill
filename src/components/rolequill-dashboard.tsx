@@ -197,7 +197,7 @@ function ProfileInput({
           disabled={!value.trim()}
           className="absolute right-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-stone-950/70 text-stone-300 transition hover:border-amber-300/60 hover:text-white disabled:cursor-not-allowed disabled:text-stone-600"
         >
-          ↗
+          <ExternalLinkIcon />
         </button>
       </div>
     </label>
@@ -247,6 +247,25 @@ function TrashIcon() {
       <path d="M14 11v6" />
       <path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
       <path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-4 w-4" aria-hidden="true">
+      <path d="M14 5h5v5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m10 14 9-9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M19 14v3a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className="h-4 w-4" aria-hidden="true">
+      <path d="M5 12h11" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m12 5 7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -942,7 +961,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
                     <div className="flex-1">
                       <textarea value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void handleAsk(); } }} rows={1} placeholder="5 best projects for ML Engineer" className="min-h-[2.25rem] w-full resize-none bg-transparent px-1 py-1 text-[13px] leading-5 text-stone-50 outline-none placeholder:text-[11px] placeholder:text-stone-500 sm:min-h-[4.5rem] sm:text-sm sm:leading-7 sm:placeholder:text-sm" />
                     </div>
-                    <button type="button" onClick={() => void handleAsk()} disabled={isAsking || !question.trim() || (!githubRepos.length && (!hasResume || !hasJobDescription))} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-50 text-stone-950 disabled:bg-stone-500 disabled:text-stone-200 sm:h-11 sm:w-11">↗</button>
+                    <button type="button" onClick={() => void handleAsk()} disabled={isAsking || !question.trim() || (!githubRepos.length && (!hasResume || !hasJobDescription))} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-50 text-stone-950 disabled:bg-stone-500 disabled:text-stone-200 sm:h-11 sm:w-11"><SendIcon /></button>
                   </div>
                 </div>
               </div>
@@ -956,3 +975,4 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
     </>
   );
 }
+

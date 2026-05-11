@@ -1,16 +1,61 @@
 # Rolequill
 
-Rolequill is a GitHub-grounded career workspace for drafting job application answers and asking role-specific questions against your resume, job description, and project history.
+<p align="center">
+  <img src="./public/logo.png" alt="Rolequill logo" width="96" />
+</p>
 
-## What It Does
+<p align="center">
+  <strong>GitHub-grounded career drafting workspace for resumes, job descriptions, and project-based answers.</strong>
+</p>
 
-- Signs users in with GitHub via NextAuth.
-- Pulls project context from GitHub-linked data and repo summaries.
-- Lets users save a job description and ask follow-up questions in chat.
-- Generates multiple grounded draft answers for job applications.
-- Uses Groq for model responses, with controlled local fallbacks when keys are missing.
+<p align="center">
+  Rolequill helps you turn your resume, GitHub repos, and target JD into grounded chat answers and tailored application drafts.
+</p>
 
-## Stack
+<p align="center">
+  <img src="./demo.png" alt="Rolequill product demo" />
+</p>
+
+## Overview
+
+Rolequill is a Next.js app for technical job applicants who want better answers than generic AI output.
+
+Instead of responding from a blank prompt, it works from:
+
+- your resume text
+- your saved profile links
+- the current job description
+- synced GitHub repository context
+- recent chat history
+
+The result is a workspace that can:
+
+- answer role-fit questions with context
+- rank relevant projects for a target role
+- generate multiple grounded application drafts
+- keep the flow tied to your actual work instead of invented claims
+
+## Features
+
+- GitHub OAuth sign-in with NextAuth
+- Resume parsing and local session persistence
+- Job description save-and-continue flow
+- Context-aware chat backed by Groq
+- Repo ranking against a prompt or JD
+- Draft generation for application-style answers
+- Responsive landing page and dashboard
+- Dark/light theme toggle
+
+## Product Flow
+
+1. Sign in with GitHub.
+2. Add your resume and profile links.
+3. Paste the target job description.
+4. Sync GitHub repositories.
+5. Ask questions like `best projects for this role` or `why does this project fit the JD`.
+6. Generate tailored application drafts from the same context.
+
+## Tech Stack
 
 - Next.js 16
 - React 19
@@ -19,19 +64,13 @@ Rolequill is a GitHub-grounded career workspace for drafting job application ans
 - NextAuth
 - Groq SDK
 - Cheerio
-- React Markdown + remark-gfm
-
-## Core App Flow
-
-1. Sign in with GitHub.
-2. Add resume text and profile links.
-3. Paste the target job description.
-4. Ask project or role-fit questions in chat.
-5. Generate tailored application drafts from the same context.
+- React Markdown
+- remark-gfm
+- unpdf
 
 ## Environment Variables
 
-Create a `.env.local` file in the project root.
+Create `.env.local` in the project root:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
@@ -45,17 +84,17 @@ AUTH_GITHUB_SECRET=your_github_oauth_client_secret
 
 ## GitHub OAuth Setup
 
-For local development, configure your GitHub OAuth app like this:
+For local development:
 
 - Homepage URL: `http://localhost:3000`
 - Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
 
-For production, use your deployed domain instead:
+For production:
 
 - Homepage URL: `https://rolequill.komalpreet.me`
 - Authorization callback URL: `https://rolequill.komalpreet.me/api/auth/callback/github`
 
-If you actively use both local and production sign-in, keep separate GitHub OAuth apps. One callback URL will not cover both cleanly.
+If you need both local and production auth, keep separate GitHub OAuth apps.
 
 ## Getting Started
 
@@ -65,7 +104,7 @@ Install dependencies:
 npm install
 ```
 
-Run the dev server:
+Start the dev server:
 
 ```bash
 npm run dev
@@ -88,24 +127,32 @@ npm run lint
 
 ## API Routes
 
-- `POST /api/ask`
-  Uses Groq chat completions for contextual Q&A against resume, job description, GitHub context, and recent chat history.
+### `POST /api/ask`
 
-- `POST /api/generate`
-  Generates four structured application drafts from candidate and role inputs.
+Contextual Q&A using:
 
-- `POST /api/github/analyze`
-  Processes GitHub-related project context.
+- resume text
+- job description
+- GitHub repo context
+- recent chat history
 
-- `POST /api/github/talking-points`
-  Produces project talking points from GitHub context.
+Notes:
 
-## Notes
+- uses `openai/gpt-oss-20b` by default
+- retries once with compacted context before failing
+- returns a local mock mode if `GROQ_API_KEY` is missing
 
-- The default model is `openai/gpt-oss-20b` unless `GROQ_MODEL` is overridden.
-- `/api/ask` retries once with compacted context before failing.
-- If `GROQ_API_KEY` is missing, some routes fall back to local template behavior.
-- Production deploys require matching GitHub OAuth settings and Vercel environment variables.
+### `POST /api/generate`
+
+Generates four grounded application drafts from candidate and role inputs.
+
+### `POST /api/github/analyze`
+
+Ranks synced repositories against a target prompt or job context.
+
+### `POST /api/github/talking-points`
+
+Builds project talking points from repository context.
 
 ## Project Structure
 
@@ -121,11 +168,14 @@ src/
     theme-toggle.tsx
   lib/
   auth.ts
+public/
+  logo.png
+demo.png
 ```
 
 ## Deployment
 
-For Vercel production, set these environment variables:
+For Vercel, set:
 
 - `GROQ_API_KEY`
 - `GROQ_MODEL`
@@ -134,8 +184,14 @@ For Vercel production, set these environment variables:
 - `AUTH_GITHUB_ID`
 - `AUTH_GITHUB_SECRET`
 
-Then make sure the GitHub OAuth app callback URL matches the deployed domain exactly.
+Also make sure the GitHub OAuth callback URL matches the deployed domain exactly.
+
+## Notes
+
+- Some local fallback behavior is intentional when model credentials are missing.
+- Chat quality depends heavily on the quality of the synced repo README content.
+- The app is optimized around grounded drafting, not open-ended chatbot behavior.
 
 ## Author
 
-Made with love by [Komal](https://komalpreet.me)
+Built by [Komal](https://komalpreet.me)
