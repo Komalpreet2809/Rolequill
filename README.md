@@ -1,7 +1,9 @@
 # Rolequill
 
 <p align="center">
-  <img src="./public/logo.png" alt="Rolequill Logo" width="120" />
+  <a href="https://rolequill.komalpreet.me">
+    <img src="./public/logo.png" alt="Rolequill Logo" width="120" style="background-color: white; border-radius: 20px; padding: 10px;" />
+  </a>
 </p>
 
 <h2 align="center">Master Every Role with Total Context</h2>
