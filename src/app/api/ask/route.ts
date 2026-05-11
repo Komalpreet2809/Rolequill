@@ -26,6 +26,30 @@ type NormalizedAskPayload = {
   chatHistory: { role: "user" | "assistant"; content: string }[];
 };
 
+type MessageBuildOptions = {
+  maxResumeChars: number;
+  maxJobChars: number;
+  maxGithubChars: number;
+  maxHistoryEntries: number;
+  maxHistoryChars: number;
+};
+
+const defaultMessageBuildOptions: MessageBuildOptions = {
+  maxResumeChars: 6000,
+  maxJobChars: 5000,
+  maxGithubChars: 6500,
+  maxHistoryEntries: 6,
+  maxHistoryChars: 500,
+};
+
+const compactMessageBuildOptions: MessageBuildOptions = {
+  maxResumeChars: 2500,
+  maxJobChars: 2200,
+  maxGithubChars: 2200,
+  maxHistoryEntries: 3,
+  maxHistoryChars: 220,
+};
+
 function isCasualPrompt(question: string) {
   const normalized = question.trim().toLowerCase();
   return /^(hi|hey|hello|yo|sup|thanks|thank you|cool|okay|ok)$/.test(normalized);
@@ -114,20 +138,28 @@ function buildProfileSection(profile: ProfileData | undefined): string {
   return `Candidate profile links:\n${lines.join("\n")}`;
 }
 
-function buildMessages(payload: NormalizedAskPayload) {
+function truncateText(value: string, maxChars: number) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxChars) return normalized;
+  return `${normalized.slice(0, maxChars)}...`;
+}
+
+function buildMessages(payload: NormalizedAskPayload, options: MessageBuildOptions = defaultMessageBuildOptions) {
   const profileSection = buildProfileSection(payload.profile);
   const includeRepoContext = shouldUseRepoContext(payload.question) || shouldContinueRepoContextFromHistory(payload.chatHistory);
   const includeJobContext = shouldUseJobContext(payload.question) || shouldContinueJobContextFromHistory(payload.chatHistory);
   const includeResumeContext = shouldUseResumeContext(payload.question) || includeJobContext;
   const userParts = [
-    ...(includeResumeContext ? [`Resume Content (Highlights Only):\n${payload.resumeText || "None provided"}`] : []),
-    ...(includeJobContext ? [`Job Description (Target Role):\n${payload.jobDescription || "None provided"}`] : []),
-    ...(includeRepoContext && payload.githubContext ? [`GitHub Repository Context:\n${payload.githubContext}`] : []),
+    ...(includeResumeContext ? [`Resume Content (Highlights Only):\n${truncateText(payload.resumeText, options.maxResumeChars) || "None provided"}`] : []),
+    ...(includeJobContext ? [`Job Description (Target Role):\n${truncateText(payload.jobDescription, options.maxJobChars) || "None provided"}`] : []),
+    ...(includeRepoContext && payload.githubContext ? [`GitHub Repository Context:\n${truncateText(payload.githubContext, options.maxGithubChars)}`] : []),
     ...((includeResumeContext || includeRepoContext || includeJobContext) && profileSection ? [profileSection] : []),
     ...(payload.chatHistory.length
       ? [
           "Recent Conversation History:",
-          ...payload.chatHistory.map((entry) => `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}`),
+          ...payload.chatHistory
+            .slice(-options.maxHistoryEntries)
+            .map((entry) => `${entry.role === "user" ? "User" : "Assistant"}: ${truncateText(entry.content, options.maxHistoryChars)}`),
         ]
       : []),
     `Current User Question:\n${payload.question}`,
@@ -166,6 +198,22 @@ function buildMessages(payload: NormalizedAskPayload) {
       content: userParts.filter(p => p.trim().length > 5).join("\n\n"),
     },
   ];
+}
+
+async function requestAnswer(client: Groq, payload: NormalizedAskPayload, options: MessageBuildOptions) {
+  const completion = await client.chat.completions.create({
+    model: defaultModel,
+    messages: buildMessages(payload, options),
+    temperature: 0.3,
+  });
+
+  const answer = completion.choices[0]?.message?.content?.trim();
+
+  if (!answer) {
+    throw new Error("Groq returned an empty answer.");
+  }
+
+  return answer;
 }
 
 export async function POST(request: Request) {
@@ -207,16 +255,13 @@ export async function POST(request: Request) {
 
   try {
     const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await client.chat.completions.create({
-      model: defaultModel,
-      messages: buildMessages(normalizedPayload),
-      temperature: 0.3,
-    });
+    let answer: string;
 
-    const answer = completion.choices[0]?.message?.content?.trim();
-
-    if (!answer) {
-      throw new Error("Groq returned an empty answer.");
+    try {
+      answer = await requestAnswer(client, normalizedPayload, defaultMessageBuildOptions);
+    } catch (initialError) {
+      console.error("Rolequill ask route retrying with compact context", initialError);
+      answer = await requestAnswer(client, normalizedPayload, compactMessageBuildOptions);
     }
 
     return NextResponse.json({
@@ -227,11 +272,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Rolequill ask route failed", error);
 
-    return NextResponse.json({
-      answer: buildFallbackAnswer(normalizedPayload),
-      mode: "mock",
-      model: "template-fallback",
-      message: "The Groq request failed, so Rolequill fell back to the local answer generator.",
-    } satisfies AskResponse);
+    return NextResponse.json(
+      {
+        error: "Rolequill could not get a model response for that turn. Start a new chat or ask again with the project name explicitly.",
+      },
+      { status: 502 }
+    );
   }
 }

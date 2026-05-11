@@ -97,6 +97,12 @@ function deriveChatState() {
   };
 }
 
+function truncateText(value: string, maxChars: number) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxChars) return normalized;
+  return `${normalized.slice(0, maxChars)}...`;
+}
+
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -328,8 +334,9 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
   function buildChatGitHubContext(prompt: string, history: ChatEntry[]) {
     const searchText = [...history.slice(-6).map((entry) => entry.content), prompt].join("\n");
     const tokens = buildExpandedKeywordSet(searchText);
+    const normalizedSearchText = searchText.toLowerCase();
 
-    const repoSummaryLines = githubRepos.map((repo) => {
+    const repoSummaryLines = githubRepos.slice(0, 12).map((repo) => {
       const parts = [
         repo.fullName,
         repo.description || "No description",
@@ -342,8 +349,8 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
     const relevantRepos = [...githubRepos]
       .map((repo) => {
         const exactNameHit =
-          searchText.toLowerCase().includes(repo.name.toLowerCase()) ||
-          searchText.toLowerCase().includes(repo.fullName.toLowerCase());
+          normalizedSearchText.includes(repo.name.toLowerCase()) ||
+          normalizedSearchText.includes(repo.fullName.toLowerCase());
         const readmeText = repo.readme.toLowerCase();
         const supportText = [
           repo.name,
@@ -368,19 +375,19 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
         };
       })
       .sort((a, b) => b.score - a.score)
-      .slice(0, 8)
+      .slice(0, 4)
       .map((entry) => entry.repo);
 
     const focusedDetails = relevantRepos
       .map((repo) => {
         const match = repoMatches.find((entry) => entry.repoId === repo.id);
-        const compactReadme = repo.readme.replace(/\s+/g, " ").trim().slice(0, 1000);
+        const compactReadme = truncateText(repo.readme, 360);
         return [
           `Repository: ${repo.fullName}`,
           compactReadme ? `README excerpt: ${compactReadme}` : "",
           repo.description ? `Description: ${repo.description}` : "",
-          repo.topics.length ? `Topics: ${repo.topics.join(", ")}` : "",
-          Object.keys(repo.languages).length ? `Languages: ${Object.keys(repo.languages).join(", ")}` : "",
+          repo.topics.length ? `Topics: ${repo.topics.slice(0, 6).join(", ")}` : "",
+          Object.keys(repo.languages).length ? `Languages: ${Object.keys(repo.languages).slice(0, 5).join(", ")}` : "",
           match ? `Ranking reasons: ${match.reasons.join(" | ")}` : "",
         ]
           .filter(Boolean)
@@ -392,7 +399,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
       "All Synced GitHub Repositories:",
       repoSummaryLines.join("\n"),
       "",
-      "README-First Repository Details:",
+      "Most Relevant Repository Details:",
       focusedDetails || "No repo details available.",
     ].join("\n");
   }
@@ -572,10 +579,6 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
     } catch (error) {
       const failure = error instanceof Error ? error.message : "Rolequill could not answer the question.";
       setAskError(failure);
-      updateChatEntries(sessionId, (current) => [
-        ...current,
-        { id: createEntryId(), role: "assistant", content: failure, mode: "mock" },
-      ]);
     } finally {
       setIsAsking(false);
     }
@@ -633,7 +636,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
       profile: { portfolioUrl, linkedinUrl, githubUrl, twitterUrl },
     });
     setJobDescription(trimmedJobDescription);
-    setJobDescriptionMessage("Job description saved locally. Continuing to chat.");
+    setJobDescriptionMessage(null);
     document.getElementById("chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -717,8 +720,7 @@ export function RolequillDashboard({ userName, userEmail, userImage }: Rolequill
               <p className="text-sm font-semibold uppercase tracking-[0.28em] text-stone-500">Job description</p>
               <h2 className="mt-4 font-serif text-5xl leading-none tracking-[-0.05em] text-stone-950">Paste the role brief.</h2>
               <textarea value={jobDescription} onChange={(event) => setJobDescription(event.target.value)} rows={10} placeholder="Paste the full JD here. This is what the GitHub scanner will rank your projects against." className="mt-6 w-full rounded-[2rem] border border-stone-200 bg-stone-50/80 px-5 py-5 text-sm leading-7 text-stone-900 outline-none transition focus:border-stone-500 focus:bg-white" />
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm leading-7 text-stone-600">Save the pasted JD to this browser, then jump straight to chat.</p>
+              <div className="mt-5 flex justify-end">
                 <button
                   type="button"
                   onClick={handleSaveJobDescription}
