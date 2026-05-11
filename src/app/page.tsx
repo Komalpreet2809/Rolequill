@@ -50,7 +50,7 @@ export default async function Home() {
         </div>
  
         <div className="relative flex w-full flex-1 flex-col px-3 sm:px-8 lg:px-10">
-          <div className="flex flex-1 flex-col items-center justify-center py-6 text-center sm:py-12 lg:py-24">
+          <div className="flex flex-1 flex-col items-center justify-center py-4 text-center sm:py-8 lg:py-16">
             <div className="max-w-5xl animate-fade-in-up">
               <h1 className="font-serif text-[3rem] font-black leading-[0.98] tracking-[-0.075em] text-stone-950 sm:text-7xl sm:leading-[1.08] lg:text-[7.5rem] dark:text-stone-50">
                 Master Every Role <br /> with <span className="bg-gradient-to-r from-amber-600 to-stone-600 bg-clip-text text-transparent dark:from-amber-200 dark:to-stone-400">Total Context.</span>
