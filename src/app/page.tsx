@@ -35,9 +35,17 @@ export default async function Home() {
           <div className="absolute right-[-8%] top-[18%] h-[24rem] w-[24rem] animate-float-delayed rounded-full bg-orange-200/25 blur-3xl dark:bg-orange-950/10" />
           <div className="absolute bottom-[-8rem] left-[18%] h-[22rem] w-[22rem] animate-float rounded-full bg-white/40 blur-3xl dark:bg-stone-800/20" />
           
-          <div className="absolute bottom-56 left-1/2 -translate-x-1/2 flex flex-col items-center select-none opacity-[0.03] dark:opacity-[0.02] sm:-bottom-20">
-            <Image src="/logo.png" alt="Rolequill Logo Watermark" width={320} height={320} className="h-[8rem] w-[8rem] object-contain grayscale -mb-6 dark:invert animate-breathe sm:h-[20rem] sm:w-[20rem] sm:-mb-24" />
-            <h2 className="font-serif text-[5.5rem] font-bold tracking-tighter text-stone-950 dark:text-stone-50 sm:text-[24rem]">Rolequill</h2>
+          <div className="absolute bottom-56 left-1/2 -translate-x-1/2 flex flex-col items-center select-none opacity-[0.03] dark:opacity-[0.02] sm:-bottom-10 lg:-bottom-20">
+            <Image
+              src="/logo.png"
+              alt="Rolequill Logo Watermark"
+              width={320}
+              height={320}
+              className="h-[8rem] w-[8rem] object-contain grayscale -mb-6 dark:invert animate-breathe sm:h-[12rem] sm:w-[12rem] sm:-mb-12 md:h-[15rem] md:w-[15rem] md:-mb-16 lg:h-[20rem] lg:w-[20rem] lg:-mb-24"
+            />
+            <h2 className="font-serif text-[5.5rem] font-bold tracking-tighter text-stone-950 dark:text-stone-50 sm:text-[10rem] md:text-[14rem] lg:text-[18rem] xl:text-[24rem]">
+              Rolequill
+            </h2>
           </div>
         </div>
  
@@ -89,7 +97,7 @@ export default async function Home() {
       ) : (
         <section id="access" className="mx-auto flex min-h-screen w-full max-w-7xl snap-start items-center px-4 py-10 sm:px-10 sm:py-16 lg:px-12">
           <div className="w-full overflow-hidden rounded-[2.4rem] border border-white/70 bg-white/72 shadow-[0_28px_80px_rgba(120,53,15,0.12)] backdrop-blur dark:border-stone-800 dark:bg-stone-900/40">
-            <div className="flex flex-col items-center justify-center p-6 text-center sm:p-20">
+            <div className="flex min-h-[26rem] flex-col items-center justify-center p-6 text-center sm:min-h-0 sm:p-20">
                 <p className="text-sm font-semibold uppercase tracking-[0.05em] text-stone-500 dark:text-stone-400">Access</p>
                 <h2 className="mt-6 max-w-2xl font-serif text-3xl leading-[1.05] tracking-[-0.05em] text-stone-950 sm:mt-8 sm:text-5xl dark:text-stone-50">
                   Connect GitHub to open the working sections.

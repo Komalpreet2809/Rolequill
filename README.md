@@ -1,82 +1,141 @@
 # Rolequill
 
-<div align="center">
-  <img src="public/logo.png" alt="Rolequill Logo" width="120" />
-  <h3>The Deep-Context Career Intelligence Workspace</h3>
-  <p>Evolving job applications from guesswork to data-driven technical audits.</p>
-</div>
+Rolequill is a GitHub-grounded career workspace for drafting job application answers and asking role-specific questions against your resume, job description, and project history.
 
----
+## What It Does
 
-## 🖋️ Overview
+- Signs users in with GitHub via NextAuth.
+- Pulls project context from GitHub-linked data and repo summaries.
+- Lets users save a job description and ask follow-up questions in chat.
+- Generates multiple grounded draft answers for job applications.
+- Uses Groq for model responses, with controlled local fallbacks when keys are missing.
 
-**Rolequill** is a high-end career assistant designed for technical professionals. Unlike standard AI career tools, Rolequill operates on a **Full Profile Mirror** engine—it doesn't just read your resume; it audits your entire GitHub presence, parsing READMEs, tech stacks, and repository metadata to build a comprehensive technical "brain" of your career.
+## Stack
 
-By grounding every answer in live-scraped repository data and your professional resume, Rolequill generates high-fidelity, structured responses that align your actual work history with specific job requirements.
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- NextAuth
+- Groq SDK
+- Cheerio
+- React Markdown + remark-gfm
 
----
+## Core App Flow
 
-## ✨ Core Intelligence Features
+1. Sign in with GitHub.
+2. Add resume text and profile links.
+3. Paste the target job description.
+4. Ask project or role-fit questions in chat.
+5. Generate tailored application drafts from the same context.
 
-- **Full Profile Mirror Mode**: Rolequill performs parallel technical audits of up to 15 repositories at once, ingesting full README contents and metadata to ensure 100% accuracy in project discovery.
-- **Deep Technical Grounding**: Answers are cross-referenced across your Resume, GitHub repositories, and Portfolio links.
-- **Structured Architectural Output**: AI responses are rendered using Markdown tables and bold technical sections for maximum readability and professional presentation.
-- **GitHub-First Identity**: Seamlessly integrated with GitHub OAuth for a secure, developer-focused workspace.
-- **High-Contrast Workspace**: A premium, minimalist workspace designed for focus, featuring a dark-mode optimized, high-contrast aesthetic.
+## Environment Variables
 
----
-
-## 🛠️ Technology Stack
-
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Intelligence**: [Groq SDK](https://groq.com/) (LLM-agnostic grounding)
-- **Scraping Engine**: [Cheerio](https://cheerio.js.org/) (Live GitHub Audit)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Markdown**: [React-Markdown](https://github.com/remarkjs/react-markdown) with GFM support
-
----
-
-## 🚀 Getting Started
-
-### 1. Environment Configuration
-
-Create a `.env.local` file in the root directory and configure the following variables:
+Create a `.env.local` file in the project root.
 
 ```env
-# Intelligence
 GROQ_API_KEY=your_groq_api_key
 GROQ_MODEL=openai/gpt-oss-20b
 
-# Authentication
+NEXTAUTH_URL=http://localhost:3000
 AUTH_SECRET=your_nextauth_secret
-AUTH_GITHUB_ID=your_github_oauth_id
-AUTH_GITHUB_SECRET=your_github_oauth_secret
+AUTH_GITHUB_ID=your_github_oauth_client_id
+AUTH_GITHUB_SECRET=your_github_oauth_client_secret
 ```
 
-### 2. Local Installation
+## GitHub OAuth Setup
+
+For local development, configure your GitHub OAuth app like this:
+
+- Homepage URL: `http://localhost:3000`
+- Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
+
+For production, use your deployed domain instead:
+
+- Homepage URL: `https://rolequill.komalpreet.me`
+- Authorization callback URL: `https://rolequill.komalpreet.me/api/auth/callback/github`
+
+If you actively use both local and production sign-in, keep separate GitHub OAuth apps. One callback URL will not cover both cleanly.
+
+## Getting Started
+
+Install dependencies:
 
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start the development server
+Run the dev server:
+
+```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000` to access your workspace.
+Open:
 
----
+```text
+http://localhost:3000
+```
 
-## 📋 Workspace Workflow
+## Scripts
 
-1. **GitHub Sync**: Sign in with your GitHub account to authorize profile access.
-2. **Knowledge Ingestion**: Upload your latest Resume (PDF/Markdown) and provide your professional links.
-3. **Target Analysis**: Paste the target Job Description to define the context.
-4. **Technical Audit**: Ask specific questions (e.g., "Find my best EDA projects for this role").
-5. **Structured Delivery**: Receive a structured, table-formatted summary of your matching technical expertise.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
 
----
+## API Routes
 
-Made with ❤️ by [Komal](https://komalpreet.me)
+- `POST /api/ask`
+  Uses Groq chat completions for contextual Q&A against resume, job description, GitHub context, and recent chat history.
+
+- `POST /api/generate`
+  Generates four structured application drafts from candidate and role inputs.
+
+- `POST /api/github/analyze`
+  Processes GitHub-related project context.
+
+- `POST /api/github/talking-points`
+  Produces project talking points from GitHub context.
+
+## Notes
+
+- The default model is `openai/gpt-oss-20b` unless `GROQ_MODEL` is overridden.
+- `/api/ask` retries once with compacted context before failing.
+- If `GROQ_API_KEY` is missing, some routes fall back to local template behavior.
+- Production deploys require matching GitHub OAuth settings and Vercel environment variables.
+
+## Project Structure
+
+```text
+src/
+  app/
+    api/
+    layout.tsx
+    page.tsx
+  components/
+    auth-controls.tsx
+    rolequill-dashboard.tsx
+    theme-toggle.tsx
+  lib/
+  auth.ts
+```
+
+## Deployment
+
+For Vercel production, set these environment variables:
+
+- `GROQ_API_KEY`
+- `GROQ_MODEL`
+- `NEXTAUTH_URL`
+- `AUTH_SECRET`
+- `AUTH_GITHUB_ID`
+- `AUTH_GITHUB_SECRET`
+
+Then make sure the GitHub OAuth app callback URL matches the deployed domain exactly.
+
+## Author
+
+Made with love by [Komal](https://komalpreet.me)
