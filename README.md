@@ -2,7 +2,13 @@
 
 <p align="center">
   <a href="https://rolequill.komalpreet.me">
-    <img src="./public/logo.png" alt="Rolequill Logo" width="120" style="background-color: white; border-radius: 20px; padding: 10px;" />
+    <table align="center">
+      <tr>
+        <td bgcolor="#ffffff" align="center" style="padding: 20px; border-radius: 20px;">
+          <img src="./public/logo.png" alt="Rolequill Logo" width="120" />
+        </td>
+      </tr>
+    </table>
   </a>
 </p>
 
